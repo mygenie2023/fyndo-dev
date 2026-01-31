@@ -1,15 +1,12 @@
 services:
   postgres:
     image: postgres:16
-    restart: always
+    restart: unless-stopped
 
     environment:
       POSTGRES_DB: fyndo
       POSTGRES_USER: fyndo_user
       POSTGRES_PASSWORD: fyndo_234
-
-    ports:
-      - "5432:5432"
 
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -23,6 +20,8 @@ services:
 
   app:
     build: .
+    restart: unless-stopped
+
     ports:
       - "5000:5000"
 
