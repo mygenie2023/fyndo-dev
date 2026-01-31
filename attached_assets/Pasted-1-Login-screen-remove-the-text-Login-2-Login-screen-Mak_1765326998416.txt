@@ -1,0 +1,30 @@
+1.	Login screen - remove the text "Login"
+2.	Login screen - Make the text "Enter your mobile number to continue" prominent by increasing the font size and making it bold
+3.	Login screen - Change the text "Send OTP" to "Continue"
+4.	Login screen - Upon clicking the "Continue" button, the users shall land on the "Tell Us About Yourself" screen
+5.	For now, hide the "Verify OTP" screen. This means there won't be any OTP verification process.
+6.	Tell Us About Yourself screen - In the "Your location" input field, the user should be able to manually enter the name of the location. 
+7.	Tell Us About Yourself screen - Provide a new field that displays the user's map location. User should be able to use "Use Current Location", the app should accurately fetch the current location. 
+8.	Farmer - Post a Job screen - The farmer user shall not be allowed to select today's date and tomorrow's date while posting the job. 
+9.	Farmer - "What's your budget?" screen - The application shall automatically calculate the budget using the formula (Rs.650 x duration selected x workers needed). The farmer shall not be able to enter a value less than (Rs.650 x duration selected x workers needed)
+10.	Farmer - Edit Job screen - The farmer user shall not be allowed to select today's date and tomorrow's date while posting the job.
+11.	Farmer - Hide the "Notifications" tab for now. 
+12.	Farmer - User should be able to edit their name, mobile number, and location. A button "Edit" shall be provided in the Profile screen to allow user to edit these fields.
+13.	Associate - The "Jobs" screen is not displaying the job posts for the selected skills
+14.	Associate - Hide the "Notifications" tab for now.
+15.	Associate - User should be able to edit their name, mobile number, and location. A button "Edit" shall be provided in the Profile screen to allow user to edit these fields.
+16.	Associate - "Jobs" listing screen - Clicking "Interested" button for an active job is removing the job from the "Jobs" screen. It should be retained, but the status should be changed to "Interested".
+17.	Admin - Remove the text "Admin Login" 
+18.	Admin - "Jobs" screen - Remove the column "Job Id" from the table 
+19.	Admin - "Jobs" screen - Add column "Workers" - This column should display the count of workers needed for the job
+20.	Admin - "Jobs" screen - Add column "Days" - This column should display the number of days required by the farmer
+21.	Admin - "Jobs" screen - Add column "Budget" - The budget value entered by the farmer
+22.	Admin - "Jobs" screen - The order of the columns - Requested By, Mobile, Service, Workers, Days, Budget, Status, and Action
+23.	Admin - "Jobs" screen - Provide a button "Post a Job" to allow the admin to post a job on behalf of a farmer.
+24.	Admin - "Job Details" screen - Remove "Job ID"
+25.	Admin - "Job Details" screen - Instead of "Date & Time", display "Date"
+26.	Admin - "Job Details" screen - Provide map link to the farmer's location
+27.	Admin - "User Details" screen -Remove "User ID"
+28.	Admin - "User Details" screen - Provide map link to the user's location
+29.	Admin - "User Details" screen - "Associated Jobs" table - Remove "Job ID"
+30.	Admin - "Services" screen - The services added by the admin are not reflecting on the farmer's post a job screen and associates skill selection screen. They all should match.

@@ -1,0 +1,317 @@
+You are building a full-stack mobile app (React Native + Node.js + MongoDB/PostgreSQL) that connects farmers with agricultural associates.
+Follow all requirements below and generate clean, production-quality code, modular architecture, reusable components, and complete screens with navigation.
+Use modern UI (React Native, Expo, Tailwind-RN/NativeWind), secure APIs, and scalable backend.
+
+APP NAME:
+
+FYNDO
+
+CORE FEATURES TO IMPLEMENT
+1. Login / Signup
+
+Mobile number authentication using OTP (mock service or Firebase Auth).
+
+After login, redirect user to Profile Setup.
+
+2. Profile Setup
+
+Create a screen to collect:
+
+Name
+
+Auto-detected location (use device GPS; allow user to change location via map picker)
+
+User Type selection: Farmer or Associate
+
+Store completed profile in backend.
+
+3. Farmer Flow
+
+After selecting Farmer, create a guided, AI-friendly workflow for posting farming service requirements.
+
+3A. Create Work Request
+
+Create a multi-step, user-friendly form with the following fields:
+
+Type of service required
+
+Show list/grid (Ploughing, Harvesting, Sowing, Irrigation, Fertilizing, General Labour, etc.)
+
+When service is required
+
+Date + Time picker
+
+Estimated duration
+
+Number of days slider/dropdown (1–30)
+
+Number of associates required
+
+Numeric input
+
+Skill level
+
+Dropdown: Beginner / Intermediate / Expert
+
+Budget
+
+Enter estimated budget or range
+
+Ensure clean validation and multi-step UX.
+
+3B. Work Request Matching Logic
+
+When a farmer posts a job:
+
+App finds associates within 20 km radius of farmer's GPS location.
+
+Only associates whose skill matches the job requirements should receive push notifications.
+
+A “Work Post” appears on the associate dashboard.
+
+Associates can tap “Express Interest”.
+
+Display all interested associates in a section inside the job details.
+
+For each interested associate, show:
+
+Name
+
+Skill level
+
+Hourly rate
+
+Average rating
+
+Work history count
+
+Farmer can shortlist and select required number of associates.
+
+3C. Payment Screen
+
+After selecting associates:
+
+Show payment summary.
+
+Supported modes:
+
+UPI
+
+Cash on Delivery (COD)
+
+Implement at least mock integration for UPI.
+
+On payment success → generate a work order.
+
+3D. Work Completion + Reviews
+
+Once work is marked complete:
+
+Farmer can provide:
+
+Star rating (1–5)
+
+Written review
+
+Skill feedback for each associate
+
+4. Associate Flow
+
+When user selects Associate:
+
+4A. Manage Profile
+
+Add/edit skills
+
+Add expertise level
+
+Set hourly rate
+
+Add work experience summary
+
+Manage availability
+
+4B. Dashboard for Associates
+
+Show:
+
+New job posts that match skills and location
+
+Shortlisted jobs (separate screen)
+
+Past work history
+
+Dashboard metrics:
+
+Total earnings
+
+Pending payments
+
+Average rating
+
+Number of shortlisted posts
+
+4C. Interactions
+
+Press Express Interest on relevant posts
+
+Track job status
+
+View farmer reviews and ratings on their profile
+
+5. Backend API Requirements
+
+Generate REST APIs for:
+
+Authentication (OTP)
+
+Profile creation & update
+
+Create job posts
+
+Search nearby associates (with geolocation)
+
+Express interest API
+
+Shortlist associates API
+
+Payment initiation (mock)
+
+Work order management
+
+Review submissions
+
+Dashboard stats
+
+Use:
+
+Node.js + Express
+
+MongoDB (with geolocation index) OR PostgreSQL + PostGIS
+
+Ensure:
+
+JWT authentication
+
+Input validation
+
+Logging
+
+Error handling
+
+Folder structure with controllers, services, models, and routes
+
+6. Database Schemas (high level)
+Users
+
+id
+
+name
+
+phone
+
+location (lat, long)
+
+userType (Farmer/Associate)
+
+skills, expertise
+
+hourlyRate
+
+avgRating
+
+reviews[]
+
+pastWork[]
+
+Jobs
+
+id
+
+farmerId
+
+serviceType
+
+date/time
+
+duration
+
+associatesRequired
+
+skillLevel
+
+budget
+
+location
+
+interestedAssociates[]
+
+shortlistedAssociates[]
+
+status (Open/Assigned/Completed)
+
+Payments
+
+jobId
+
+associateId
+
+amount
+
+mode (UPI/COD)
+
+status
+
+7. UI/UX Requirements
+
+Modern, clean, professional UI
+
+Use bottom tab navigation for Farmer and Associate flows
+
+Push notifications flow
+
+Map view for selecting location
+
+Reusable card components for job posts, profiles, and dashboards
+
+Error/success feedback components
+
+Dark mode compatible
+
+8. Deliverables Required from Replit AI
+
+The AI should generate:
+
+React Native (Expo) mobile app codebase
+
+Node.js backend project
+
+Database schema & models
+
+API integration in frontend
+
+Push notification setup
+
+Form validations + workflows
+
+Complete navigation
+
+Mock UPI payment flow
+
+Instructions to run the app
+
+9. Code Quality Requirements
+
+Break code into clean modules
+
+Use TypeScript for both frontend and backend
+
+Follow MVC pattern on backend
+
+Use async/await for all calls
+
+Include comments, types, interfaces
+
+Use proper error boundaries
+
+Use dotenv for secrets

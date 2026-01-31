@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: always
+
+    environment:
+      POSTGRES_DB: fyndo
+      POSTGRES_USER: fyndo_user
+      POSTGRES_PASSWORD: fyndo_234
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fyndo_user -d fyndo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+
+    env_file:
+      - .env
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    command: >
+      sh -c "
+      npx drizzle-kit push &&
+      npx pm2-runtime ecosystem.config.cjs
+      "
+
+volumes:
+  pgdata:

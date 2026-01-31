@@ -1,0 +1,55 @@
+General feedback:
+
+1. Both the farmers and associates when they login to the application, they shall be seeing only 3 tabs in the bottom navigation bar - "Jobs", "Alerts", "More"
+2. The top bar of the "Jobs" page should just have the app branding, for e.g, FYNDO logo and name
+
+
+Farmer:
+
+A. "Jobs" Page: 
+1. If there are no jobs (posted by the farmer), the "Jobs" page should ALWAYS prompt them to post the job by asking the questions. 
+2. The questions should prompt them to choose the service type, date required (time not needed), Duration required, number of associates required, Budget that they have for this work. 
+3. Upon providing all the info, the app shall display a preview of the information that the user has filled-in.
+4. Also, let the user know that to post the job request they will have to pay a booking charge of Rs.250 via UPI.
+5. If the user is okay, they can proceed to the next step of completing the payment. 
+6. Once payment is confirmed, they shall be redirected to the confirmation screen and from there they can navigate to the jobs listing screen. The confirmation screen should state the request has been received and they will be contacted in 24-48 hours. 
+7. The job that the user has created should be listed in the "Jobs" page. 
+8. The farmer shall be able to click on the job that they have created and be able to edit/update/cancel request/mark completed.
+9. Each job shall have a status. The status can be "Active", "Cancelled", "Completed"
+10. The jobs shall be grouped to their respective status 
+11. Each job should indicate how many associates have expressed interest to a job request.
+12. Once a job is marked completed, the app should allow the user to provide review and ratings for the entire job and rating for each associate too. 
+13. Each job must show the shortlisted associates by FYNDO
+
+B. "Alters" page:
+1. This page shall display notifications. The notifications can be - 
+- Alerting the user a day before the work is requested.
+- Alerting the user to mark a job complete (date required + Duration) 
+- Alerting the user that they can now review a job (once it is marked complete)
+
+C. "More" page:
+- The user shall be able to edit their profile info - name, mobile number, change location
+- Turn ON/OFF the alerts
+- Contact FYNDO (connected to a mobile number)
+- logout
+
+
+Associate:
+A. "Jobs" Page:
+1. If there are no jobs, prompt the associate to select the works they are interested in (multi-select). 
+2. List the active jobs posted by the farmer in and around 20 km radius 
+3. There must be a search bar to find the jobs
+4. The user must have option to mark "Interested" or "Not Interested"
+5. There must be a section to show the shortlisted jobs by FYNDO for the associate
+6. There must be a section to show the completed jobs by the associate and this section also should show the reviews and rating provided by the farmer (for the entire job and associate level)
+6. This page should show the number of jobs completed by the associate, average rating received from the farmer
+
+B. "Alters" page:
+1. This page shall display notifications. The notifications can be alerting the user when a new job is posted in and around 20 km
+
+C. "More" page:
+- The user shall be able to edit their profile info - name, mobile number, change location
+- Choose/Update the skills
+- Turn ON/OFF the alerts
+- Contact FYNDO (connected to a mobile number)
+- logout

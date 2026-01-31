@@ -1,0 +1,86 @@
+{
+  "app": {
+    "name": "FYNDO",
+    "tagline": "Connecting Fields, Empowering Hands"
+  },
+  "login": {
+    "title": "Login",
+    "enterPhone": "Enter your mobile number to continue",
+    "phoneNumber": "Mobile Number",
+    "phonePlaceholder": "10-digit mobile number",
+    "sendOTP": "Send OTP",
+    "continue": "Continue",
+    "sending": "Sending...",
+    "verifyOTP": "Verify OTP",
+    "otpDescription": "Enter the 6-digit code sent to your mobile",
+    "changeMobileNumber": "Change Mobile Number",
+    "welcomeBack": "Welcome back!",
+    "loginSuccess": "Logged in successfully",
+    "loginError": "Failed to login",
+    "termsText": "By continuing, you agree to FYNDO's Terms of Service and Privacy Policy"
+  },
+  "profileSetup": {
+    "title": "Tell Us About Yourself",
+    "name": "Your Name",
+    "namePlaceholder": "Enter your full name",
+    "userType": "I am a...",
+    "farmer": "Farmer",
+    "associate": "Agricultural Associate",
+    "farmerDescription": "Post jobs and hire agricultural associates",
+    "associateDescription": "Find agricultural work opportunities near you",
+    "location": "Location",
+    "locationPlaceholder": "Enter your city/village",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Complete Setup",
+    "stepOf": "Step {{current}} of {{total}}",
+    "creating": "Creating...",
+    "profileCreated": "Profile created!",
+    "welcomeMessage": "Welcome to FYNDO",
+    "profileError": "Failed to create profile"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back!",
+    "overview": "Overview",
+    "recentJobs": "Recent Jobs",
+    "nearbyJobs": "Nearby Jobs",
+    "manageJobs": "Manage your job postings",
+    "findOpportunities": "Find opportunities near you",
+    "post": "Post",
+    "noJobsPosted": "No jobs posted yet",
+    "noJobsAvailable": "No jobs available nearby",
+    "createFirstJob": "Create your first job posting",
+    "checkBackSoon": "Check back soon for new opportunities"
+  },
+  "metrics": {
+    "totalEarnings": "Total Earnings",
+    "jobsCompleted": "Jobs Completed",
+    "averageRating": "Average Rating",
+    "shortlistedJobs": "Shortlisted Jobs",
+    "activeJobs": "Active Jobs",
+    "totalSpent": "Total Spent",
+    "avgRatingGiven": "Avg Rating Given",
+    "pending": "Pending"
+  },
+  "nav": {
+    "jobs": "Jobs",
+    "alerts": "Alerts",
+    "more": "More"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "landing": {
+    "connectWorkers": "Connect with Workers",
+    "connectWorkersDesc": "Farmers can post jobs and associates can find work opportunities in their area",
+    "locationBased": "Location-Based Matching",
+    "locationBasedDesc": "Find work opportunities within 20km radius based on your skills and location",
+    "skillMatching": "Smart Skill Matching",
+    "skillMatchingDesc": "Associates are matched with jobs based on their agricultural expertise and experience",
+    "getStarted": "Get Started"
+  },
+  "tagline": "Connecting Fields, Empowering Hands"
+}
