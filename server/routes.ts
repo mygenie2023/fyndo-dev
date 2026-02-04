@@ -2,6 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, insertJobSchema, insertJobInterestSchema, insertReviewSchema, adminLoginSchema, insertServiceSchema } from "@shared/schema";
+import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "$MartApp2025";
@@ -16,6 +17,8 @@ const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Register object storage routes for file uploads
+  registerObjectStorageRoutes(app);
   
   app.post("/api/auth/login", async (req, res) => {
     try {

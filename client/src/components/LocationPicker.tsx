@@ -34,6 +34,13 @@ export default function LocationPicker({
     setIsDetecting(true);
     
     if ("geolocation" in navigator) {
+      // Use high accuracy options for better location precision
+      const options: PositionOptions = {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      };
+      
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const lat = position.coords.latitude;
@@ -55,8 +62,34 @@ export default function LocationPicker({
         },
         (error) => {
           console.error("Error detecting location:", error);
-          setIsDetecting(false);
-        }
+          // Try again without high accuracy as fallback
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              
+              const locationName = await reverseGeocode(lat, lng);
+              
+              const location = {
+                lat,
+                lng,
+                address: locationName,
+              };
+              
+              setAddress(locationName);
+              setCoordinates({ lat, lng });
+              
+              onLocationSelect?.(location);
+              setIsDetecting(false);
+            },
+            (fallbackError) => {
+              console.error("Fallback location detection failed:", fallbackError);
+              setIsDetecting(false);
+            },
+            { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+          );
+        },
+        options
       );
     } else {
       console.log("Geolocation not supported");
