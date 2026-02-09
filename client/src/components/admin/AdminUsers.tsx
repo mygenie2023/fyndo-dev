@@ -37,15 +37,12 @@ export default function AdminUsers() {
   const [editForm, setEditForm] = useState({
     name: "",
     phoneNumber: "",
-    userType: "Farmer" as string,
     location: "",
     gender: "",
     dateOfBirth: "",
     expectedDailySalary: "",
     travelDistance: "",
     comfortableStaying: "",
-    skillLevel: "",
-    hourlyRate: "",
   });
   const [newUser, setNewUser] = useState({
     name: "",
@@ -111,15 +108,12 @@ export default function AdminUsers() {
     setEditForm({
       name: user.name || "",
       phoneNumber: user.phoneNumber || "",
-      userType: user.userType || "Farmer",
       location: user.location || "",
       gender: user.gender || "",
       dateOfBirth: user.dateOfBirth || "",
       expectedDailySalary: user.expectedDailySalary?.toString() || "",
       travelDistance: user.travelDistance?.toString() || "",
       comfortableStaying: user.comfortableStaying || "",
-      skillLevel: user.skillLevel || "",
-      hourlyRate: user.hourlyRate?.toString() || "",
     });
     setShowEditUser(true);
   };
@@ -133,14 +127,12 @@ export default function AdminUsers() {
       location: editForm.location || undefined,
     };
 
-    if (editingUser.userType === "Associate") {
+    if (editingUser.userType?.toLowerCase() === "associate") {
       data.gender = editForm.gender || undefined;
       data.dateOfBirth = editForm.dateOfBirth || undefined;
       data.expectedDailySalary = editForm.expectedDailySalary ? parseInt(editForm.expectedDailySalary) : undefined;
       data.travelDistance = editForm.travelDistance ? parseInt(editForm.travelDistance) : undefined;
       data.comfortableStaying = editForm.comfortableStaying || undefined;
-      data.skillLevel = editForm.skillLevel || undefined;
-      data.hourlyRate = editForm.hourlyRate ? parseInt(editForm.hourlyRate) : undefined;
     }
 
     editUserMutation.mutate({ id: editingUser.id, data });
@@ -192,7 +184,7 @@ export default function AdminUsers() {
                       <TableCell>{user.phoneNumber}</TableCell>
                       <TableCell className="max-w-xs truncate">{user.location || "N/A"}</TableCell>
                       <TableCell>
-                        <Badge variant={user.userType === "Farmer" ? "default" : "secondary"}>
+                        <Badge variant={user.userType?.toLowerCase() === "farmer" ? "default" : "secondary"}>
                           {user.userType}
                         </Badge>
                       </TableCell>
@@ -327,15 +319,6 @@ export default function AdminUsers() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-role">Role</Label>
-              <Input
-                id="edit-role"
-                value={editForm.userType}
-                disabled
-                data-testid="input-edit-role"
-              />
-            </div>
-            <div className="space-y-2">
               <Label htmlFor="edit-location">Location</Label>
               <Input
                 id="edit-location"
@@ -346,7 +329,7 @@ export default function AdminUsers() {
               />
             </div>
 
-            {editingUser?.userType === "Associate" && (
+            {editingUser?.userType?.toLowerCase() === "associate" && (
               <>
                 <div className="border-t pt-4">
                   <p className="text-sm font-medium text-muted-foreground mb-3">Associate Details</p>
@@ -413,33 +396,6 @@ export default function AdminUsers() {
                       <SelectItem value="no">No</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-skill-level">Skill Level</Label>
-                  <Select
-                    value={editForm.skillLevel}
-                    onValueChange={(value) => setEditForm({ ...editForm, skillLevel: value })}
-                  >
-                    <SelectTrigger data-testid="select-edit-skill-level">
-                      <SelectValue placeholder="Select skill level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Beginner">Beginner</SelectItem>
-                      <SelectItem value="Intermediate">Intermediate</SelectItem>
-                      <SelectItem value="Expert">Expert</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-hourly-rate">Hourly Rate (Rs.)</Label>
-                  <Input
-                    id="edit-hourly-rate"
-                    type="number"
-                    value={editForm.hourlyRate}
-                    onChange={(e) => setEditForm({ ...editForm, hourlyRate: e.target.value })}
-                    placeholder="Enter hourly rate"
-                    data-testid="input-edit-hourly-rate"
-                  />
                 </div>
               </>
             )}

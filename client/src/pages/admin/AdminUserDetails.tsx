@@ -163,18 +163,6 @@ export default function AdminUserDetails() {
                         <p className="capitalize">{user.comfortableStaying}</p>
                       </div>
                     )}
-                    {user.skillLevel && (
-                      <div>
-                        <p className="text-sm text-muted-foreground">Skill Level</p>
-                        <p>{user.skillLevel}</p>
-                      </div>
-                    )}
-                    {user.hourlyRate && (
-                      <div>
-                        <p className="text-sm text-muted-foreground">Hourly Rate</p>
-                        <p>Rs. {user.hourlyRate}</p>
-                      </div>
-                    )}
                   </>
                 )}
               </div>
