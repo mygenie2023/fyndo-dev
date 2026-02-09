@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Leaf, LogOut } from "lucide-react";
@@ -11,6 +11,9 @@ import AdminServices from "@/components/admin/AdminServices";
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
   const { admin, logout } = useAdmin();
+  const params = new URLSearchParams(window.location.search);
+  const initialTab = params.get("tab") || "jobs";
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   useEffect(() => {
     if (!admin) {
@@ -59,7 +62,7 @@ export default function AdminDashboard() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="jobs" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full max-w-2xl grid-cols-3 mx-auto">
             <TabsTrigger value="jobs" data-testid="tab-jobs">
               Jobs

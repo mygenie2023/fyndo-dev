@@ -63,7 +63,7 @@ export default function AdminUserDetails() {
       <div className="container mx-auto max-w-6xl">
         <Button
           variant="ghost"
-          onClick={() => setLocation("/admin/dashboard")}
+          onClick={() => setLocation("/admin/dashboard?tab=users")}
           className="mb-4"
           data-testid="button-back"
         >
