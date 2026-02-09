@@ -397,6 +397,7 @@ export default function AdminUsers() {
                     type="date"
                     value={editForm.dateOfBirth}
                     onChange={(e) => setEditForm({ ...editForm, dateOfBirth: e.target.value })}
+                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split("T")[0]}
                     data-testid="input-edit-dob"
                   />
                 </div>
