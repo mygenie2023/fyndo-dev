@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
@@ -23,10 +23,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Eye, Plus, Pencil } from "lucide-react";
+import { Eye, Plus, Pencil, Upload, Check, Loader2 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { User } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { useUpload } from "@/hooks/use-upload";
 
 export default function AdminUsers() {
   const [, setLocation] = useLocation();
@@ -44,6 +45,13 @@ export default function AdminUsers() {
     travelDistance: "",
     comfortableStaying: "",
   });
+  const [editAadharFrontUrl, setEditAadharFrontUrl] = useState("");
+  const [editAadharBackUrl, setEditAadharBackUrl] = useState("");
+  const [uploadingEditFront, setUploadingEditFront] = useState(false);
+  const [uploadingEditBack, setUploadingEditBack] = useState(false);
+  const editFrontInputRef = useRef<HTMLInputElement>(null);
+  const editBackInputRef = useRef<HTMLInputElement>(null);
+  const { uploadFile } = useUpload();
   const [newUser, setNewUser] = useState({
     name: "",
     phoneNumber: "",
@@ -115,7 +123,37 @@ export default function AdminUsers() {
       travelDistance: user.travelDistance?.toString() || "",
       comfortableStaying: user.comfortableStaying || "",
     });
+    setEditAadharFrontUrl(user.aadharFrontUrl || "");
+    setEditAadharBackUrl(user.aadharBackUrl || "");
     setShowEditUser(true);
+  };
+
+  const handleEditAadharFrontUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingEditFront(true);
+    try {
+      const response = await uploadFile(file);
+      if (response) {
+        setEditAadharFrontUrl(response.objectPath);
+      }
+    } finally {
+      setUploadingEditFront(false);
+    }
+  };
+
+  const handleEditAadharBackUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingEditBack(true);
+    try {
+      const response = await uploadFile(file);
+      if (response) {
+        setEditAadharBackUrl(response.objectPath);
+      }
+    } finally {
+      setUploadingEditBack(false);
+    }
   };
 
   const handleSaveEdit = () => {
@@ -133,6 +171,8 @@ export default function AdminUsers() {
       data.expectedDailySalary = editForm.expectedDailySalary ? parseInt(editForm.expectedDailySalary) : undefined;
       data.travelDistance = editForm.travelDistance ? parseInt(editForm.travelDistance) : undefined;
       data.comfortableStaying = editForm.comfortableStaying || undefined;
+      data.aadharFrontUrl = editAadharFrontUrl || undefined;
+      data.aadharBackUrl = editAadharBackUrl || undefined;
     }
 
     editUserMutation.mutate({ id: editingUser.id, data });
@@ -397,6 +437,81 @@ export default function AdminUsers() {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="border-t pt-4">
+                  <p className="text-sm font-medium text-muted-foreground mb-3">KYC Documents - Aadhar Card</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Aadhar Front Side</Label>
+                  <input
+                    type="file"
+                    ref={editFrontInputRef}
+                    onChange={handleEditAadharFrontUpload}
+                    accept="image/*"
+                    className="hidden"
+                    data-testid="input-edit-aadhar-front"
+                  />
+                  <Button
+                    type="button"
+                    variant={editAadharFrontUrl ? "default" : "outline"}
+                    className="w-full"
+                    onClick={() => editFrontInputRef.current?.click()}
+                    disabled={uploadingEditFront}
+                    data-testid="button-edit-aadhar-front"
+                  >
+                    {uploadingEditFront ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : editAadharFrontUrl ? (
+                      <>
+                        <Check className="w-4 h-4 mr-2" />
+                        Front Side Uploaded (Click to Replace)
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Front Side
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <Label>Aadhar Back Side</Label>
+                  <input
+                    type="file"
+                    ref={editBackInputRef}
+                    onChange={handleEditAadharBackUpload}
+                    accept="image/*"
+                    className="hidden"
+                    data-testid="input-edit-aadhar-back"
+                  />
+                  <Button
+                    type="button"
+                    variant={editAadharBackUrl ? "default" : "outline"}
+                    className="w-full"
+                    onClick={() => editBackInputRef.current?.click()}
+                    disabled={uploadingEditBack}
+                    data-testid="button-edit-aadhar-back"
+                  >
+                    {uploadingEditBack ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : editAadharBackUrl ? (
+                      <>
+                        <Check className="w-4 h-4 mr-2" />
+                        Back Side Uploaded (Click to Replace)
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Back Side
+                      </>
+                    )}
+                  </Button>
+                </div>
               </>
             )}
           </div>
@@ -406,7 +521,7 @@ export default function AdminUsers() {
             </Button>
             <Button
               onClick={handleSaveEdit}
-              disabled={!editForm.name || !editForm.phoneNumber || editUserMutation.isPending}
+              disabled={!editForm.name || !editForm.phoneNumber || editUserMutation.isPending || uploadingEditFront || uploadingEditBack}
               data-testid="button-save-edit"
             >
               {editUserMutation.isPending ? "Saving..." : "Save Changes"}

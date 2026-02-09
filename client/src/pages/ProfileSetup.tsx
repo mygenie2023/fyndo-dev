@@ -124,7 +124,9 @@ export default function ProfileSetup() {
                dateOfBirth !== "" && 
                expectedDailySalary !== "" && 
                travelDistance !== "" && 
-               comfortableStaying !== "";
+               comfortableStaying !== "" &&
+               aadharFrontUrl !== "" &&
+               aadharBackUrl !== "";
       }
       if (currentStep === 4) return selectedLocation !== null;
     } else {
@@ -362,7 +364,7 @@ export default function ProfileSetup() {
                 {/* Aadhar KYC Upload Section */}
                 <div className="space-y-3 pt-2 border-t">
                   <Label className="text-sm font-medium">{t("profileSetup.aadharKyc", "Aadhar Card for KYC Verification")}</Label>
-                  <p className="text-xs text-muted-foreground">{t("profileSetup.aadharKycDescription", "Upload front and back side of your Aadhar card")}</p>
+                  <p className="text-xs text-muted-foreground">{t("profileSetup.aadharKycDescription", "Upload front and back side of your Aadhar card (required)")}</p>
                   
                   {/* Aadhar Front Upload */}
                   <div className="space-y-2">
