@@ -9,7 +9,6 @@ import {
   LogOut, 
   ChevronRight,
   Tractor,
-  Briefcase,
   Pencil,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,7 +18,6 @@ import { useUser } from "@/lib/userContext";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import SkillSelection from "@/components/SkillSelection";
 import { useState } from "react";
 
 export default function Profile() {
@@ -28,7 +26,6 @@ export default function Profile() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [alertsEnabled, setAlertsEnabled] = useState(true);
-  const [showSkillSelection, setShowSkillSelection] = useState(false);
 
   const handleLogout = () => {
     setUser(null);
@@ -37,43 +34,6 @@ export default function Profile() {
 
   const contactNumber = "+91 98765 43210"; // FYNDO contact number
 
-  // Show skill selection if managing skills
-  if (showSkillSelection) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pb-24">
-        {/* Top Bar with Branding and Language Switcher */}
-        <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-card-border/60 shadow-sm">
-          <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowSkillSelection(false)}
-                data-testid="button-back-skills"
-              >
-                <ChevronRight className="w-5 h-5 rotate-180" />
-              </Button>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                  <Tractor className="w-4 h-4 text-primary-foreground" strokeWidth={2.5} />
-                </div>
-                <span className="font-bold text-lg">FYNDO</span>
-              </div>
-            </div>
-            <LanguageSwitcher />
-          </div>
-        </header>
-        
-        <SkillSelection onComplete={() => {
-          setShowSkillSelection(false);
-          setLocation("/jobs");
-        }} />
-        
-        {/* Bottom Navigation */}
-        <BottomNav />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pb-24">
@@ -137,30 +97,6 @@ export default function Profile() {
 
         {/* Settings Section */}
         <div className="space-y-3">
-          {/* Skills (Associate only) */}
-          {user?.userType?.toLowerCase() === "associate" && (
-            <Card 
-              className="hover-elevate transition-all duration-300 cursor-pointer" 
-              data-testid="card-manage-skills"
-              onClick={() => setShowSkillSelection(true)}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
-                      <Briefcase className="w-5 h-5 text-foreground" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-sm">Manage Skills</h4>
-                      <p className="text-xs text-muted-foreground">Update your work preferences</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
           {/* Alerts Toggle */}
           <Card data-testid="card-alerts-toggle">
             <CardContent className="p-4">
