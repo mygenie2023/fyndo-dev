@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,24 +14,17 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useUpload } from "@/hooks/use-upload";
 import LocationPicker from "@/components/LocationPicker";
-
-const availableSkills = [
-  "Ploughing",
-  "Harvesting",
-  "Sowing",
-  "Irrigation",
-  "Fertilizing",
-  "Weeding",
-  "Pesticide Application",
-  "General Farm Work",
-  "Livestock Care",
-  "Machinery Operation",
-];
+import type { Service } from "@shared/schema";
 
 export default function EditProfile() {
   const [, setLocation] = useLocation();
   const { user, setUser, isLoading } = useUser();
   const { toast } = useToast();
+
+  const { data: services = [] } = useQuery<Service[]>({
+    queryKey: ["/api/services"],
+  });
+  const availableSkills = services.filter(s => s.isActive === 1).map(s => s.name);
   const [formData, setFormData] = useState({
     name: user?.name || "",
     phone: user?.phoneNumber || "",
