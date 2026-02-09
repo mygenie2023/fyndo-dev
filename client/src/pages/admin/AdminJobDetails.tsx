@@ -4,6 +4,7 @@ import { useRoute, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Save, Trash2, CheckCircle, Ban, Star } from "lucide-react";
+import { formatPhone } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -349,7 +350,7 @@ export default function AdminJobDetails() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Mobile</p>
-                    <p>{farmer?.phoneNumber || "N/A"}</p>
+                    <p>{formatPhone(farmer?.phoneNumber) || "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Service Type</p>
@@ -421,7 +422,7 @@ export default function AdminJobDetails() {
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            {interest.associate.phoneNumber}
+                            {formatPhone(interest.associate.phoneNumber)}
                           </p>
                           {interest.associate.skills && interest.associate.skills.length > 0 && (
                             <div className="flex gap-1 mt-2 flex-wrap">

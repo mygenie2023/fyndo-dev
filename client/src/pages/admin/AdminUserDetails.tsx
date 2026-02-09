@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
 import { ArrowLeft, Eye, FileText, ImageIcon } from "lucide-react";
+import { formatPhone } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -84,7 +85,7 @@ export default function AdminUserDetails() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Mobile Number</p>
-                  <p>{user.phoneNumber}</p>
+                  <p>{formatPhone(user.phoneNumber)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Role</p>

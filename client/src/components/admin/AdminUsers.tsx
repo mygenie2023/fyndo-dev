@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Eye, Plus, Pencil, Upload, Check, Loader2 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { formatPhone } from "@/lib/utils";
 import type { User } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { useUpload } from "@/hooks/use-upload";
@@ -221,7 +222,7 @@ export default function AdminUsers() {
                   users.map((user) => (
                     <TableRow key={user.id} data-testid={`row-user-${user.id}`}>
                       <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.phoneNumber}</TableCell>
+                      <TableCell>{formatPhone(user.phoneNumber)}</TableCell>
                       <TableCell className="max-w-xs truncate">{user.location || "N/A"}</TableCell>
                       <TableCell>
                         <Badge variant={user.userType?.toLowerCase() === "farmer" ? "default" : "secondary"}>

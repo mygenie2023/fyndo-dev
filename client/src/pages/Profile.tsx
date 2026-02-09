@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useUser } from "@/lib/userContext";
 import { useToast } from "@/hooks/use-toast";
+import { formatPhone } from "@/lib/utils";
 import BottomNav from "@/components/BottomNav";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useState } from "react";
@@ -84,7 +85,7 @@ export default function Profile() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 text-sm">
                       <Phone className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">{user?.phoneNumber}</span>
+                      <span className="text-muted-foreground">{formatPhone(user?.phoneNumber)}</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
                       <MapPin className="w-4 h-4 text-muted-foreground" />

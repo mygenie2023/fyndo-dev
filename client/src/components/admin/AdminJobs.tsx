@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { formatPhone } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -107,7 +108,7 @@ export default function AdminJobs() {
                 sortedJobs.map((job) => (
                   <TableRow key={job.id} data-testid={`row-job-${job.id}`}>
                     <TableCell>{job.farmer?.name || "Unknown"}</TableCell>
-                    <TableCell>{job.farmer?.phoneNumber || "N/A"}</TableCell>
+                    <TableCell>{formatPhone(job.farmer?.phoneNumber) || "N/A"}</TableCell>
                     <TableCell>{job.serviceType}</TableCell>
                     <TableCell>{job.associatesNeeded}</TableCell>
                     <TableCell>{job.duration}</TableCell>
