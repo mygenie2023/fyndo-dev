@@ -35,7 +35,7 @@ export default function AdminUserDetails() {
 
   const { data: farmerJobs = [] } = useQuery<Job[]>({
     queryKey: [`/api/jobs/farmer/${userId}`],
-    enabled: !!userId && user?.userType === "Farmer",
+    enabled: !!userId && user?.userType?.toLowerCase() === "farmer",
   });
 
   if (isLoading || !user) {
@@ -88,7 +88,7 @@ export default function AdminUserDetails() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Role</p>
-                  <Badge variant={user.userType === "Farmer" ? "default" : "secondary"}>
+                  <Badge variant={user.userType?.toLowerCase() === "farmer" ? "default" : "secondary"}>
                     {user.userType}
                   </Badge>
                 </div>
@@ -107,7 +107,7 @@ export default function AdminUserDetails() {
                     </a>
                   )}
                 </div>
-                {user.userType === "Associate" && user.skills && user.skills.length > 0 && (
+                {user.userType?.toLowerCase() === "associate" && user.skills && user.skills.length > 0 && (
                   <div className="md:col-span-2">
                     <p className="text-sm text-muted-foreground mb-2">Skills</p>
                     <div className="flex gap-2 flex-wrap">
@@ -119,7 +119,7 @@ export default function AdminUserDetails() {
                     </div>
                   </div>
                 )}
-                {user.userType === "Associate" && (
+                {user.userType?.toLowerCase() === "associate" && (
                   <>
                     <div>
                       <p className="text-sm text-muted-foreground">Average Rating</p>
@@ -182,7 +182,7 @@ export default function AdminUserDetails() {
           </Card>
 
           {/* Aadhar KYC Documents Section */}
-          {user.userType === "Associate" && (user.aadharFrontUrl || user.aadharBackUrl) && (
+          {user.userType?.toLowerCase() === "associate" && (user.aadharFrontUrl || user.aadharBackUrl) && (
             <Card className="bg-card/80 backdrop-blur-xl border-card-border/60">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -285,7 +285,7 @@ export default function AdminUserDetails() {
             </DialogContent>
           </Dialog>
 
-          {user.userType === "Farmer" && (
+          {user.userType?.toLowerCase() === "farmer" && (
             <Card className="bg-card/80 backdrop-blur-xl border-card-border/60">
               <CardHeader>
                 <CardTitle>Posted Jobs ({farmerJobs.length})</CardTitle>
