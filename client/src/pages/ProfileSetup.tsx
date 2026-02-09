@@ -309,6 +309,7 @@ export default function ProfileSetup() {
                     type="date"
                     value={dateOfBirth}
                     onChange={(e) => setDateOfBirth(e.target.value)}
+                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split("T")[0]}
                     className="h-11"
                     data-testid="input-date-of-birth"
                   />

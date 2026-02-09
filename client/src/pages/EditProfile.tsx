@@ -301,6 +301,7 @@ export default function EditProfile() {
                     type="date"
                     value={formData.dateOfBirth}
                     onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split("T")[0]}
                     data-testid="input-dob"
                   />
                 </div>
