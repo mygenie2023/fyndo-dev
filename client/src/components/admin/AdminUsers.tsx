@@ -281,9 +281,12 @@ export default function AdminUsers() {
               <Label htmlFor="phone">Mobile Number</Label>
               <Input
                 id="phone"
+                type="tel"
+                inputMode="numeric"
+                maxLength={10}
                 value={newUser.phoneNumber}
-                onChange={(e) => setNewUser({ ...newUser, phoneNumber: e.target.value })}
-                placeholder="Enter mobile number"
+                onChange={(e) => setNewUser({ ...newUser, phoneNumber: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                placeholder="Enter 10-digit mobile number"
                 data-testid="input-user-phone"
               />
             </div>
@@ -319,7 +322,7 @@ export default function AdminUsers() {
             </Button>
             <Button
               onClick={handleAddUser}
-              disabled={!newUser.name || !newUser.phoneNumber || addUserMutation.isPending}
+              disabled={!newUser.name || newUser.phoneNumber.length !== 10 || addUserMutation.isPending}
               data-testid="button-submit-user"
             >
               {addUserMutation.isPending ? "Adding..." : "Add User"}
@@ -352,9 +355,12 @@ export default function AdminUsers() {
               <Label htmlFor="edit-phone">Mobile Number</Label>
               <Input
                 id="edit-phone"
+                type="tel"
+                inputMode="numeric"
+                maxLength={10}
                 value={editForm.phoneNumber}
-                onChange={(e) => setEditForm({ ...editForm, phoneNumber: e.target.value })}
-                placeholder="Enter mobile number"
+                onChange={(e) => setEditForm({ ...editForm, phoneNumber: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                placeholder="Enter 10-digit mobile number"
                 data-testid="input-edit-phone"
               />
             </div>
@@ -522,7 +528,7 @@ export default function AdminUsers() {
             </Button>
             <Button
               onClick={handleSaveEdit}
-              disabled={!editForm.name || !editForm.phoneNumber || editUserMutation.isPending || uploadingEditFront || uploadingEditBack}
+              disabled={!editForm.name || editForm.phoneNumber.length !== 10 || editUserMutation.isPending || uploadingEditFront || uploadingEditBack}
               data-testid="button-save-edit"
             >
               {editUserMutation.isPending ? "Saving..." : "Save Changes"}
