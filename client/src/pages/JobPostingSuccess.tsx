@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
+import fyndoLogo from "@assets/FYNDO_v1.0_1770731684699.png";
 
 export default function JobPostingSuccess() {
   const [, setLocation] = useLocation();
@@ -13,10 +14,7 @@ export default function JobPostingSuccess() {
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-card/80 backdrop-blur-xl">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">A</span>
-          </div>
-          <span className="font-semibold text-lg">FYNDO</span>
+          <img src={fyndoLogo} alt="FYNDO" className="h-8" data-testid="img-logo" />
         </div>
         <LanguageSwitcher />
       </div>

@@ -2,7 +2,8 @@ import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Leaf, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
+import fyndoLogo from "@assets/FYNDO_v1.0_1770731684699.png";
 import { useAdmin } from "@/lib/adminContext";
 import AdminJobs from "@/components/admin/AdminJobs";
 import AdminUsers from "@/components/admin/AdminUsers";
@@ -45,8 +46,8 @@ export default function AdminDashboard() {
       <div className="bg-card/80 backdrop-blur-xl border-b border-card-border/60 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Leaf className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-semibold">FYNDO Admin</h1>
+            <img src={fyndoLogo} alt="FYNDO" className="h-8" data-testid="img-logo" />
+            <span className="text-sm font-medium text-muted-foreground">Admin</span>
           </div>
           <Button
             variant="outline"

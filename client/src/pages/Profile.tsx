@@ -8,7 +8,6 @@ import {
   BellOff,
   LogOut, 
   ChevronRight,
-  Tractor,
   Pencil,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { useUser } from "@/lib/userContext";
 import { useToast } from "@/hooks/use-toast";
 import { formatPhone } from "@/lib/utils";
+import fyndoLogo from "@assets/FYNDO_v1.0_1770731684699.png";
 import BottomNav from "@/components/BottomNav";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useState } from "react";
@@ -42,10 +42,7 @@ export default function Profile() {
       <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-card-border/60 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md shadow-primary/20">
-              <Tractor className="w-5 h-5 text-primary-foreground" strokeWidth={2.5} />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight">{t("app.name")}</h1>
+            <img src={fyndoLogo} alt="FYNDO" className="h-8" data-testid="img-logo" />
           </div>
           <LanguageSwitcher />
         </div>
