@@ -41,7 +41,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Top Bar */}
       <div className="bg-card/80 backdrop-blur-xl border-b border-card-border/60 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">

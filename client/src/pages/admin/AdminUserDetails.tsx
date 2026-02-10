@@ -41,7 +41,7 @@ export default function AdminUserDetails() {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
+      <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
         <div className="text-center py-8">Loading user details...</div>
       </div>
     );
@@ -60,7 +60,7 @@ export default function AdminUserDetails() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
       <div className="container mx-auto max-w-6xl">
         <Button
           variant="ghost"

@@ -10,7 +10,7 @@ export default function JobPostingSuccess() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-green-50/50 to-white dark:from-green-950/20 dark:to-background">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-teal-50/50 to-white dark:from-teal-950/20 dark:to-background">
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-card/80 backdrop-blur-xl">
         <div className="flex items-center gap-2">
@@ -24,8 +24,8 @@ export default function JobPostingSuccess() {
         <div className="max-w-md w-full space-y-6 text-center">
           {/* Success Icon */}
           <div className="flex justify-center">
-            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-12 h-12 text-green-600 dark:text-green-400" />
+            <div className="w-20 h-20 bg-teal-100 dark:bg-teal-900/30 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-12 h-12 text-teal-600 dark:text-teal-400" />
             </div>
           </div>
 

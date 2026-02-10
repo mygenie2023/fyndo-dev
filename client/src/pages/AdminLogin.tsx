@@ -54,7 +54,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-teal-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-card-border/60">
         <CardHeader className="text-center space-y-4">
           <div className="flex flex-col items-center gap-2">

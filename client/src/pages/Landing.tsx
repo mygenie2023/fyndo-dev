@@ -87,7 +87,7 @@ export default function Landing() {
 
       {/* Footer */}
       <div className="py-6 text-center text-sm text-muted-foreground">
-        <p>© 2024 FYNDO. All rights reserved.</p>
+        <p>© 2026 FYNDO. All rights reserved.</p>
       </div>
     </div>
   );

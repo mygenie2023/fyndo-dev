@@ -46,7 +46,7 @@ export default function Notifications() {
       case "action":
         return <AlertCircle className="w-5 h-5 text-orange-500" />;
       case "review":
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
+        return <CheckCircle className="w-5 h-5 text-teal-500" />;
       default:
         return <Bell className="w-5 h-5 text-muted-foreground" />;
     }
