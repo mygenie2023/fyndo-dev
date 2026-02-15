@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, insertJobSchema, insertJobInterestSchema, insertReviewSchema, adminLoginSchema, insertServiceSchema } from "@shared/schema";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
-import { ObjectStorageService, ObjectNotFoundError } from "./replit_integrations/object_storage/objectStorage";
+import { S3StorageService, ObjectNotFoundError } from "./s3Storage";
 
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "$MartApp2025";
@@ -340,9 +340,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Aadhar image not found" });
       }
 
-      const objectStorageService = new ObjectStorageService();
-      const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
-      await objectStorageService.downloadObject(objectFile, res);
+      const s3Service = new S3StorageService();
+      await s3Service.downloadObject(objectPath, res);
     } catch (error) {
       if (error instanceof ObjectNotFoundError) {
         return res.status(404).json({ error: "Aadhar image not found in storage" });

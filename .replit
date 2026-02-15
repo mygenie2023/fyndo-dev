@@ -44,3 +44,5 @@ integrations = ["javascript_database:1.0.0", "javascript_stripe:1.0.0", "javascr
 [userenv]
 
 [userenv.shared]
+AWS_REGION = "ap-south-1"
+AWS_S3_BUCKET = "fyndo-dev-assets"
