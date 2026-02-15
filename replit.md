@@ -60,6 +60,7 @@ FYNDO provides distinct workflows for farmers and associates.
 
 ## External Dependencies
 
+- **AWS S3:** File storage for user uploads (KYC documents, etc.). Region: ap-south-1, Bucket: fyndo-dev-assets. Uses presigned URLs for direct client uploads.
 - **OpenStreetMap Nominatim API:** Used for reverse geocoding to convert coordinates into human-readable location names.
 - **i18next:** Library for internationalization, enabling multi-language support.
 - **Stripe:** Planned integration for payment gateway processing (booking charges).
