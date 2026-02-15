@@ -4,7 +4,6 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
 } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Response } from "express";
 import { randomUUID } from "crypto";
 import { Readable } from "stream";
@@ -35,19 +34,19 @@ export class S3StorageService {
     this.bucket = AWS_BUCKET;
   }
 
-  async getObjectEntityUploadURL(): Promise<{ uploadURL: string; objectPath: string }> {
+  async uploadFile(fileBuffer: Buffer, contentType: string): Promise<string> {
     const objectId = randomUUID();
     const key = `uploads/${objectId}`;
 
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key: key,
+      Body: fileBuffer,
+      ContentType: contentType,
     });
 
-    const uploadURL = await getSignedUrl(s3Client, command, { expiresIn: 900 });
-    const objectPath = `/objects/${key}`;
-
-    return { uploadURL, objectPath };
+    await s3Client.send(command);
+    return `/objects/${key}`;
   }
 
   extractKeyFromObjectPath(objectPath: string): string {
@@ -110,22 +109,5 @@ export class S3StorageService {
     } catch {
       return false;
     }
-  }
-
-  normalizeObjectEntityPath(rawPath: string): string {
-    if (rawPath.startsWith("/objects/")) {
-      return rawPath;
-    }
-
-    try {
-      const url = new URL(rawPath);
-      const pathParts = url.pathname.split("/");
-      if (pathParts.length >= 3) {
-        const key = pathParts.slice(2).join("/");
-        return `/objects/${key}`;
-      }
-    } catch {}
-
-    return rawPath;
   }
 }
