@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/lib/adminContext";
-import { Leaf } from "lucide-react";
+import fyndoLogo from "@assets/FYNDO_v1.0_1770731684699.png";
 
 export default function AdminLogin() {
   const [, setLocation] = useLocation();
@@ -54,12 +54,12 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-teal-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-card-border/60">
         <CardHeader className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-2">
-            <Leaf className="w-8 h-8 text-primary" />
-            <h1 className="text-2xl font-semibold">FYNDO Admin</h1>
+          <div className="flex flex-col items-center gap-2">
+            <img src={fyndoLogo} alt="FYNDO" className="h-10" data-testid="img-logo" />
+            <span className="text-sm font-medium text-muted-foreground">Admin Panel</span>
           </div>
           <CardDescription>
             Enter your admin credentials to access the dashboard

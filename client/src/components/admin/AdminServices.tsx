@@ -232,7 +232,7 @@ export default function AdminServices() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           service.isActive === 1
-                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                            ? "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200"
                             : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
                         }`}
                       >

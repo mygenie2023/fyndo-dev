@@ -20,6 +20,8 @@ export const users = pgTable("users", {
   expectedDailySalary: integer("expected_daily_salary"),
   travelDistance: integer("travel_distance"),
   comfortableStaying: text("comfortable_staying"),
+  aadharFrontUrl: text("aadhar_front_url"),
+  aadharBackUrl: text("aadhar_back_url"),
   averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default("0"),
   totalRatings: integer("total_ratings").default(0),
   jobsCompleted: integer("jobs_completed").default(0),
