@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@/lib/userContext";
-import { Tractor } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import fyndoLogo from "@assets/FYNDO_v1.0_1770731684699.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Login() {
@@ -64,11 +64,10 @@ export default function Login() {
       
       <div className="w-full max-w-md space-y-8 relative z-10">
         <div className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/20 mb-2">
-            <Tractor className="w-10 h-10" strokeWidth={2.5} />
+          <div className="mb-2">
+            <img src={fyndoLogo} alt="FYNDO" className="h-14 mx-auto" data-testid="img-logo" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold tracking-tight text-foreground">{t("app.name")}</h1>
             <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
               {t("app.tagline")}
             </p>

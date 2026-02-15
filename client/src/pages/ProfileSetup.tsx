@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -10,9 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import LocationPicker from "@/components/LocationPicker";
 import { useUser } from "@/lib/userContext";
-import { User, Tractor, ArrowLeft } from "lucide-react";
+import { User, Tractor, ArrowLeft, Upload, Check, Loader2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useUpload } from "@/hooks/use-upload";
 
 export default function ProfileSetup() {
   const { t } = useTranslation();
@@ -30,6 +31,20 @@ export default function ProfileSetup() {
   const [expectedDailySalary, setExpectedDailySalary] = useState("");
   const [travelDistance, setTravelDistance] = useState<string>("");
   const [comfortableStaying, setComfortableStaying] = useState<string>("");
+  
+  // Aadhar KYC uploads
+  const [aadharFrontUrl, setAadharFrontUrl] = useState<string>("");
+  const [aadharBackUrl, setAadharBackUrl] = useState<string>("");
+  const [uploadingFront, setUploadingFront] = useState(false);
+  const [uploadingBack, setUploadingBack] = useState(false);
+  const frontInputRef = useRef<HTMLInputElement>(null);
+  const backInputRef = useRef<HTMLInputElement>(null);
+  
+  const { uploadFile } = useUpload({
+    onSuccess: (response) => {
+      console.log("Upload successful:", response.objectPath);
+    },
+  });
   
   // Total steps: 3 for farmers, 4 for associates (extra step for associate details)
   const totalSteps = userType === "associate" ? 4 : 3;
@@ -68,6 +83,36 @@ export default function ProfileSetup() {
     }
   };
 
+  const handleAadharFrontUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setUploadingFront(true);
+    try {
+      const response = await uploadFile(file);
+      if (response) {
+        setAadharFrontUrl(response.objectPath);
+      }
+    } finally {
+      setUploadingFront(false);
+    }
+  };
+
+  const handleAadharBackUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setUploadingBack(true);
+    try {
+      const response = await uploadFile(file);
+      if (response) {
+        setAadharBackUrl(response.objectPath);
+      }
+    } finally {
+      setUploadingBack(false);
+    }
+  };
+
   const canProceed = () => {
     if (currentStep === 1) return name.trim().length > 0;
     if (currentStep === 2) return userType !== null;
@@ -79,7 +124,9 @@ export default function ProfileSetup() {
                dateOfBirth !== "" && 
                expectedDailySalary !== "" && 
                travelDistance !== "" && 
-               comfortableStaying !== "";
+               comfortableStaying !== "" &&
+               aadharFrontUrl !== "" &&
+               aadharBackUrl !== "";
       }
       if (currentStep === 4) return selectedLocation !== null;
     } else {
@@ -112,6 +159,8 @@ export default function ProfileSetup() {
         expectedDailySalary: parseInt(expectedDailySalary) || 0,
         travelDistance: parseInt(travelDistance) || 0,
         comfortableStaying,
+        aadharFrontUrl: aadharFrontUrl || undefined,
+        aadharBackUrl: aadharBackUrl || undefined,
       });
     } else {
       profileMutation.mutate(baseData);
@@ -260,6 +309,7 @@ export default function ProfileSetup() {
                     type="date"
                     value={dateOfBirth}
                     onChange={(e) => setDateOfBirth(e.target.value)}
+                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split("T")[0]}
                     className="h-11"
                     data-testid="input-date-of-birth"
                   />
@@ -310,6 +360,88 @@ export default function ProfileSetup() {
                       <Label htmlFor="stay-no" className="font-normal cursor-pointer">{t("profileSetup.no", "No")}</Label>
                     </div>
                   </RadioGroup>
+                </div>
+
+                {/* Aadhar KYC Upload Section */}
+                <div className="space-y-3 pt-2 border-t">
+                  <Label className="text-sm font-medium">{t("profileSetup.aadharKyc", "Aadhar Card for KYC Verification")}</Label>
+                  <p className="text-xs text-muted-foreground">{t("profileSetup.aadharKycDescription", "Upload front and back side of your Aadhar card (required)")}</p>
+                  
+                  {/* Aadhar Front Upload */}
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">{t("profileSetup.aadharFront", "Aadhar Front Side")}</Label>
+                    <input
+                      type="file"
+                      ref={frontInputRef}
+                      onChange={handleAadharFrontUpload}
+                      accept="image/*"
+                      className="hidden"
+                      data-testid="input-aadhar-front"
+                    />
+                    <Button
+                      type="button"
+                      variant={aadharFrontUrl ? "default" : "outline"}
+                      className="w-full h-11"
+                      onClick={() => frontInputRef.current?.click()}
+                      disabled={uploadingFront}
+                      data-testid="button-upload-aadhar-front"
+                    >
+                      {uploadingFront ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t("profileSetup.uploading", "Uploading...")}
+                        </>
+                      ) : aadharFrontUrl ? (
+                        <>
+                          <Check className="w-4 h-4 mr-2" />
+                          {t("profileSetup.frontUploaded", "Front Side Uploaded")}
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t("profileSetup.uploadFront", "Upload Front Side")}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Aadhar Back Upload */}
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">{t("profileSetup.aadharBack", "Aadhar Back Side")}</Label>
+                    <input
+                      type="file"
+                      ref={backInputRef}
+                      onChange={handleAadharBackUpload}
+                      accept="image/*"
+                      className="hidden"
+                      data-testid="input-aadhar-back"
+                    />
+                    <Button
+                      type="button"
+                      variant={aadharBackUrl ? "default" : "outline"}
+                      className="w-full h-11"
+                      onClick={() => backInputRef.current?.click()}
+                      disabled={uploadingBack}
+                      data-testid="button-upload-aadhar-back"
+                    >
+                      {uploadingBack ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t("profileSetup.uploading", "Uploading...")}
+                        </>
+                      ) : aadharBackUrl ? (
+                        <>
+                          <Check className="w-4 h-4 mr-2" />
+                          {t("profileSetup.backUploaded", "Back Side Uploaded")}
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t("profileSetup.uploadBack", "Upload Back Side")}
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

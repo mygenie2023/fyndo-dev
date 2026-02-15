@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "FYNDO",
-    "tagline": "Connecting Fields, Empowering Hands"
+    "tagline": "Friends You Need for Daily Operations"
   },
   "login": {
     "title": "Login",
@@ -82,5 +82,5 @@
     "skillMatchingDesc": "Associates are matched with jobs based on their agricultural expertise and experience",
     "getStarted": "Get Started"
   },
-  "tagline": "Connecting Fields, Empowering Hands"
+  "tagline": "Friends You Need for Daily Operations"
 }

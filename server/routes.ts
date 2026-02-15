@@ -2,6 +2,8 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, insertJobSchema, insertJobInterestSchema, insertReviewSchema, adminLoginSchema, insertServiceSchema } from "@shared/schema";
+import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
+import { S3StorageService, ObjectNotFoundError } from "./s3Storage";
 
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "$MartApp2025";
@@ -16,6 +18,8 @@ const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Register object storage routes for file uploads
+  registerObjectStorageRoutes(app);
   
   app.post("/api/auth/login", async (req, res) => {
     try {
@@ -307,6 +311,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(users);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const updated = await storage.updateUser(req.params.id, req.body);
+      if (!updated) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to update user" });
+    }
+  });
+
+  app.get("/api/admin/users/:id/aadhar/:side", requireAdmin, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.params.id);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const { side } = req.params;
+      const objectPath = side === "front" ? user.aadharFrontUrl : user.aadharBackUrl;
+
+      if (!objectPath) {
+        return res.status(404).json({ error: "Aadhar image not found" });
+      }
+
+      const s3Service = new S3StorageService();
+      await s3Service.downloadObject(objectPath, res);
+    } catch (error) {
+      if (error instanceof ObjectNotFoundError) {
+        return res.status(404).json({ error: "Aadhar image not found in storage" });
+      }
+      console.error("Error serving Aadhar image:", error);
+      res.status(500).json({ error: "Failed to serve Aadhar image" });
     }
   });
 

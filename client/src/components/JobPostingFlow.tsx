@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { Calendar as CalendarIcon, Users, Clock, DollarSign, X, ArrowLeft, ArrowRight, Tractor } from "lucide-react";
+import { Calendar as CalendarIcon, Users, Clock, DollarSign, X, ArrowLeft, ArrowRight } from "lucide-react";
+import fyndoLogo from "@assets/FYNDO_v1.0_1770731684699.png";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -195,10 +196,7 @@ export default function JobPostingFlow({ onClose, editingJob, onSuccess }: JobPo
       <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-card-border/60 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md shadow-primary/20">
-              <Tractor className="w-5 h-5 text-primary-foreground" strokeWidth={2.5} />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight">FYNDO</h1>
+            <img src={fyndoLogo} alt="FYNDO" className="h-8" data-testid="img-logo" />
           </div>
           <LanguageSwitcher />
         </div>

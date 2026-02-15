@@ -4,6 +4,7 @@ import { useRoute, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Save, Trash2, CheckCircle, Ban, Star } from "lucide-react";
+import { formatPhone } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -124,7 +125,7 @@ export default function AdminJobDetails() {
 
   if (isLoading || !job) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
+      <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
         <div className="text-center py-8">Loading job details...</div>
       </div>
     );
@@ -143,7 +144,7 @@ export default function AdminJobDetails() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
       <div className="container mx-auto max-w-6xl">
         <Button
           variant="ghost"
@@ -349,7 +350,7 @@ export default function AdminJobDetails() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Mobile</p>
-                    <p>{farmer?.phoneNumber || "N/A"}</p>
+                    <p>{formatPhone(farmer?.phoneNumber) || "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Service Type</p>
@@ -421,7 +422,7 @@ export default function AdminJobDetails() {
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            {interest.associate.phoneNumber}
+                            {formatPhone(interest.associate.phoneNumber)}
                           </p>
                           {interest.associate.skills && interest.associate.skills.length > 0 && (
                             <div className="flex gap-1 mt-2 flex-wrap">

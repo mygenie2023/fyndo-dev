@@ -1,7 +1,8 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Tractor, Users, MapPin, Sparkles } from "lucide-react";
+import { Users, MapPin, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import fyndoLogo from "@assets/FYNDO_v1.0_1770731684699.png";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
@@ -13,12 +14,9 @@ export default function Landing() {
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         {/* Logo and Branding */}
         <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-xl shadow-primary/30 mb-6">
-            <Tractor className="w-12 h-12 text-primary-foreground" strokeWidth={2.5} />
+          <div className="mx-auto mb-6">
+            <img src={fyndoLogo} alt="FYNDO" className="h-16 mx-auto" data-testid="img-logo" />
           </div>
-          <h1 className="text-4xl font-bold text-center tracking-tight mb-2">
-            FYNDO
-          </h1>
           <p className="text-lg text-center text-muted-foreground font-medium">
             {t("tagline")}
           </p>
@@ -89,7 +87,7 @@ export default function Landing() {
 
       {/* Footer */}
       <div className="py-6 text-center text-sm text-muted-foreground">
-        <p>© 2024 FYNDO. All rights reserved.</p>
+        <p>© 2026 FYNDO. All rights reserved.</p>
       </div>
     </div>
   );

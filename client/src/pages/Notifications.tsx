@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useUser } from "@/lib/userContext";
 import BottomNav from "@/components/BottomNav";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { Tractor } from "lucide-react";
+import fyndoLogo from "@assets/FYNDO_v1.0_1770731684699.png";
 
 export default function Notifications() {
   const { t } = useTranslation();
@@ -46,7 +46,7 @@ export default function Notifications() {
       case "action":
         return <AlertCircle className="w-5 h-5 text-orange-500" />;
       case "review":
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
+        return <CheckCircle className="w-5 h-5 text-teal-500" />;
       default:
         return <Bell className="w-5 h-5 text-muted-foreground" />;
     }
@@ -58,10 +58,7 @@ export default function Notifications() {
       <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-card-border/60 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md shadow-primary/20">
-              <Tractor className="w-5 h-5 text-primary-foreground" strokeWidth={2.5} />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight">{t("app.name")}</h1>
+            <img src={fyndoLogo} alt="FYNDO" className="h-8" data-testid="img-logo" />
           </div>
           <LanguageSwitcher />
         </div>
