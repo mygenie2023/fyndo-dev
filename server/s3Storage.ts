@@ -9,7 +9,7 @@ import { randomUUID } from "crypto";
 import { Readable } from "stream";
 
 const AWS_REGION = process.env.AWS_REGION || "ap-south-1";
-const AWS_BUCKET = process.env.AWS_S3_BUCKET || "fyndo-dev-assets";
+const AWS_BUCKET = process.env.AWS_S3_BUCKET || "fyndo-assets";
 
 const s3Client = new S3Client({
   region: AWS_REGION,

@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Router as WouterRouter  } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { UserProvider } from "./lib/userContext";
@@ -26,6 +26,7 @@ import "./i18n/config";
 
 function Router() {
   return (
+    <WouterRouter base="/app">
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/login" component={Login} />
@@ -49,6 +50,7 @@ function Router() {
       
       <Route component={NotFound} />
     </Switch>
+    </WouterRouter>
   );
 }
 
