@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { supabase } from "@/lib/supabase";
 
 interface UploadResponse {
   objectPath: string;
@@ -28,27 +29,49 @@ export function useUpload(options: UseUploadOptions = {}) {
       try {
         setProgress(10);
 
-        const formData = new FormData();
-        formData.append("file", file);
+        // Generate a unique file path
+        const fileExtension = file.name.split(".").pop() || "jpg";
+        const fileName = `${crypto.randomUUID()}.${fileExtension}`;
+        const filePath = `kyc/${fileName}`;
 
-        const response = await fetch("/api/uploads/upload", {
-          method: "POST",
-          body: formData,
-        });
+        setProgress(30);
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || "Failed to upload file");
-        }
+        const { error: uploadError } = await supabase.storage
+          .from("aadhar-documents")
+          .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type,
+          });
 
-        const data: UploadResponse = await response.json();
+       if (uploadError) {
+  console.error("SUPABASE STORAGE UPLOAD ERROR:", uploadError);
+  throw uploadError;
+}
+
         setProgress(100);
-        options.onSuccess?.(data);
-        return data;
+
+        const response: UploadResponse = {
+          objectPath: filePath,
+          metadata: {
+            name: file.name,
+            size: file.size,
+            contentType: file.type,
+          },
+        };
+
+        options.onSuccess?.(response);
+
+        return response;
       } catch (err) {
-        const error = err instanceof Error ? err : new Error("Upload failed");
-        setError(error);
-        options.onError?.(error);
+        const uploadError =
+          err instanceof Error
+            ? err
+            : new Error("Failed to upload file");
+
+        setError(uploadError);
+        options.onError?.(uploadError);
+
         return null;
       } finally {
         setIsUploading(false);

@@ -9,6 +9,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 import type { Service } from "@shared/schema";
 
 const iconMap: Record<string, any> = {
@@ -29,9 +30,25 @@ export default function ServiceTypeGrid({
   selectedService,
   onSelectService,
 }: ServiceTypeGridProps) {
-  const { data: services = [], isLoading } = useQuery<Service[]>({
-    queryKey: ["/api/services"],
-  });
+const { data: services = [], isLoading } = useQuery<Service[]>({
+  queryKey: ["services"],
+  queryFn: async () => {
+    const { data, error } = await supabase.rpc(
+      "get_fyndo_services"
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    return (data ?? []).map((service: any) => ({
+      ...service,
+      iconName: service.icon_name,
+      isActive: service.is_active,
+      createdAt: service.created_at,
+    })) as Service[];
+  },
+});
 
   if (isLoading) {
     return (

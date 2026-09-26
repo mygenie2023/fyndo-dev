@@ -11,7 +11,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import { useUser } from "@/lib/userContext";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { supabase } from "@/lib/supabase";
+import { queryClient } from "@/lib/queryClient";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { format } from "date-fns";
 import ServiceTypeGrid from "@/components/ServiceTypeGrid";
@@ -51,32 +52,68 @@ export default function JobPostingFlow({ onClose, editingJob, onSuccess }: JobPo
     };
   });
 
-  const createJobMutation = useMutation({
-    mutationFn: async (jobData: any) => {
-      if (editingJob) {
-        const res = await apiRequest("PATCH", `/api/jobs/${editingJob.id}`, jobData);
-        return await res.json();
-      } else {
-        const res = await apiRequest("POST", "/api/jobs", jobData);
-        return await res.json();
+const createJobMutation = useMutation({
+  mutationFn: async (jobData: any) => {
+    // New job creation
+    if (!editingJob) {
+      const { data, error } = await supabase.rpc(
+        "create_fyndo_job",
+        {
+          p_farmer_id: jobData.farmerId,
+          p_service_type: jobData.serviceType,
+          p_date: jobData.date,
+          p_time: jobData.time,
+          p_duration: jobData.duration,
+          p_associates_needed: jobData.associatesNeeded,
+          p_skill_level: jobData.skillLevel,
+          p_budget: jobData.budget,
+          p_latitude: Number(jobData.latitude),
+          p_longitude: Number(jobData.longitude),
+          p_location: jobData.location,
+        }
+      );
+
+      if (error) throw error;
+      return data;
+    }
+
+    // Existing job edit
+    const { data, error } = await supabase.rpc(
+      "update_fyndo_job",
+      {
+        p_job_id: editingJob.id,
+        p_service_type: jobData.serviceType,
+        p_date: jobData.date,
+        p_time: jobData.time,
+        p_duration: jobData.duration,
+        p_associates_needed: jobData.associatesNeeded,
+        p_skill_level: jobData.skillLevel,
+        p_budget: jobData.budget,
+        p_latitude: Number(jobData.latitude),
+        p_longitude: Number(jobData.longitude),
+        p_location: jobData.location,
       }
-    },
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: [`/api/jobs/farmer/${user?.id}`] });
-      if (editingJob) {
-        queryClient.invalidateQueries({ queryKey: [`/api/jobs/${editingJob.id}`] });
-        onClose();
-      } else {
-        // Call success callback BEFORE closing and navigating
-        onSuccess?.();
-        onClose(); // Reset Jobs component state
-        setLocation("/jobs");
-      }
-    },
-    onError: () => {
-      // Error occurred - form will not submit
-    },
-  });
+    );
+
+    if (error) throw error;
+
+    return data;
+  },
+
+  onSuccess: (result) => {
+    queryClient.invalidateQueries({
+      queryKey: ["farmer-jobs", user?.id],
+    });
+
+    onSuccess?.();
+    onClose();
+    setLocation("/jobs");
+  },
+
+  onError: (error) => {
+    console.error("FYNDO job creation/edit error:", error);
+  },
+});
 
   const handleServiceTypeSelect = (type: string) => {
     setFormData({ ...formData, serviceType: type });

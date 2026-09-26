@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import JobCard from "@/components/JobCard";
 import BottomNav from "@/components/BottomNav";
 import { useUser } from "@/lib/userContext";
+import { supabase } from "@/lib/supabase";
 import { Search, Plus } from "lucide-react";
 import type { Job } from "@shared/schema";
 
@@ -14,10 +15,46 @@ export default function MyJobs() {
   const { user } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: jobs = [], isLoading } = useQuery<Job[]>({
-    queryKey: ["/api/jobs/farmer", user?.id],
-    enabled: !!user,
-  });
+const { data: jobs = [], isLoading } = useQuery<Job[]>({
+  queryKey: ["farmer-jobs", user?.id],
+  enabled: !!user,
+
+  queryFn: async () => {
+    if (!user) {
+      return [];
+    }
+
+    const { data, error } = await supabase.rpc(
+      "get_farmer_jobs",
+      {
+        p_farmer_id: user.id,
+      }
+    );
+
+    if (error) {
+      console.error("FYNDO farmer jobs error:", error);
+      throw error;
+    }
+
+    return (data ?? []).map((job: any) => ({
+      ...job,
+      farmerId: job.farmer_id ?? job.farmerId,
+      serviceType: job.service_type ?? job.serviceType,
+      associatesNeeded:
+        job.associates_needed ?? job.associatesNeeded,
+      skillLevel:
+        job.skill_level ?? job.skillLevel,
+      paymentMethod:
+        job.payment_method ?? job.paymentMethod,
+      jobComment:
+        job.job_comment ?? job.jobComment,
+      createdAt:
+        job.created_at ?? job.createdAt,
+      updatedAt:
+        job.updated_at ?? job.updatedAt,
+    })) as Job[];
+  },
+});
 
   const activeJobs = jobs.filter(j => j.status === "Open" || j.status === "Assigned");
   const completedJobs = jobs.filter(j => j.status === "Completed");

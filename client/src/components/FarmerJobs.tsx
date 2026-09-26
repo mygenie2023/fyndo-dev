@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useEffect } from "react";
 import { Briefcase, Calendar, Users, DollarSign, MapPin } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,22 +21,64 @@ export default function FarmerJobs({ searchQuery, setSearchQuery, onCreateJob, s
   const { user } = useUser();
   const [, setLocation] = useLocation();
 
-  // Fetch farmer's jobs
-  const { data: jobs = [], isLoading } = useQuery<Job[]>({
-    queryKey: [`/api/jobs/farmer/${user?.id}`],
-    enabled: !!user,
-  });
+// Fetch farmer's jobs from Supabase
+const {
+  data: jobs = [],
+  isLoading,
+  isError,
+  error,
+} = useQuery<Job[]>({
+  queryKey: ["farmer-jobs", user?.id],
+  enabled: !!user?.id,
+  queryFn: async () => {
+    const { data, error } = await supabase.rpc(
+      "get_farmer_jobs",
+      {
+        p_farmer_id: user!.id,
+      }
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    return (data ?? []).map((job: any) => ({
+      ...job,
+      farmerId: job.farmer_id,
+      serviceType: job.service_type,
+      associatesNeeded: job.associates_needed,
+      skillLevel: job.skill_level,
+      paymentMethod: job.payment_method,
+      jobComment: job.job_comment,
+      latitude: job.latitude?.toString(),
+      longitude: job.longitude?.toString(),
+      createdAt: job.created_at,
+    })) as Job[];
+  },
+});
 
   const activeJobs = jobs.filter(j => j.status === "Open" || j.status === "Assigned");
   const cancelledJobs = jobs.filter(j => j.status === "Cancelled");
   const completedJobs = jobs.filter(j => j.status === "Completed");
 
   // Auto-navigate to Post a Job if user has zero jobs (unless we just created one)
-  useEffect(() => {
-    if (!isLoading && jobs.length === 0 && onCreateJob && !skipAutoNavigate) {
-      onCreateJob();
-    }
-  }, [isLoading, jobs.length, onCreateJob, skipAutoNavigate]);
+useEffect(() => {
+  if (
+    !isLoading &&
+    !isError &&
+    jobs.length === 0 &&
+    onCreateJob &&
+    !skipAutoNavigate
+  ) {
+    onCreateJob();
+  }
+}, [
+  isLoading,
+  isError,
+  jobs.length,
+  onCreateJob,
+  skipAutoNavigate,
+]);
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: any; label: string }> = {
@@ -105,6 +148,19 @@ export default function FarmerJobs({ searchQuery, setSearchQuery, onCreateJob, s
       </div>
     );
   }
+
+  if (isError) {
+  return (
+    <div className="px-4 py-12 text-center">
+      <p className="text-sm text-destructive">
+        Unable to load jobs. Please try again.
+      </p>
+      <p className="text-xs text-muted-foreground mt-2">
+        {error instanceof Error ? error.message : ""}
+      </p>
+    </div>
+  );
+}
 
   return (
     <div className="px-4 py-6 space-y-4 pb-28">

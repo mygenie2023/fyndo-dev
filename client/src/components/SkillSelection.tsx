@@ -4,7 +4,7 @@ import { Check, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/lib/userContext";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { supabase } from "@/lib/supabase";
 import type { Service } from "@shared/schema";
 
 interface SkillSelectionProps {
@@ -15,26 +15,68 @@ export default function SkillSelection({ onComplete }: SkillSelectionProps = {})
   const { user, setUser } = useUser();
   const [selectedSkills, setSelectedSkills] = useState<string[]>(user?.skills || []);
 
-  const { data: services = [], isLoading: servicesLoading } = useQuery<Service[]>({
-    queryKey: ["/api/services"],
-  });
+const { data: services = [], isLoading: servicesLoading } = useQuery<Service[]>({
+  queryKey: ["services"],
+  queryFn: async () => {
+    const { data, error } = await supabase.rpc("get_fyndo_services");
+
+    if (error) {
+      throw error;
+    }
+
+    return data || [];
+  },
+});
 
   const updateSkillsMutation = useMutation({
-    mutationFn: async (skills: string[]) => {
-      const res = await apiRequest("PATCH", `/api/users/${user?.id}/skills`, { skills });
-      return await res.json();
-    },
-    onSuccess: (data) => {
-      setUser(data);
-      // Invalidate all nearby jobs queries to refetch with updated skills
-      queryClient.invalidateQueries({ queryKey: ['/api/jobs/nearby'] });
-      if (onComplete) {
-        onComplete();
-      }
-    },
-    onError: () => {
-    },
-  });
+  mutationFn: async (skills: string[]) => {
+    if (!user?.id) {
+      throw new Error("User ID is missing");
+    }
+
+    const { error } = await supabase.rpc("update_fyndo_user", {
+      p_user_id: user.id,
+      p_name: user.name ?? null,
+      p_user_type: user.userType ?? null,
+      p_latitude: user.latitude ?? null,
+      p_longitude: user.longitude ?? null,
+      p_location: user.location ?? null,
+      p_skills: skills,
+      p_skill_level: user.skillLevel ?? null,
+      p_hourly_rate: user.hourlyRate ?? null,
+      p_gender: user.gender ?? null,
+      p_date_of_birth: user.dateOfBirth ?? null,
+      p_expected_daily_salary: user.expectedDailySalary ?? null,
+      p_travel_distance: user.travelDistance ?? null,
+      p_comfortable_staying: user.comfortableStaying ?? null,
+      p_aadhar_front_url: user.aadharFrontUrl ?? null,
+      p_aadhar_back_url: user.aadharBackUrl ?? null,
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return skills;
+  },
+
+  onSuccess: (skills) => {
+    if (user) {
+      setUser({
+        ...user,
+        skills,
+      });
+    }
+
+    if (onComplete) {
+      onComplete();
+    }
+  },
+
+  onError: (error) => {
+    console.error("FYNDO skill update error:", error);
+  },
+});
 
   const toggleSkill = (skill: string) => {
     setSelectedSkills(prev =>
@@ -63,7 +105,7 @@ export default function SkillSelection({ onComplete }: SkillSelectionProps = {})
     );
   }
 
-  const activeServices = services.filter(s => s.isActive === 1);
+const activeServices = services.filter(s => s.is_active === true);
 
   return (
     <div className="px-4 py-6">

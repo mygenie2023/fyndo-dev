@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@/lib/userContext";
-import { apiRequest } from "@/lib/queryClient";
+import { supabase } from "@/lib/supabase";
 import fyndoLogo from "@assets/FYNDO_v1.0_1770731684699.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
@@ -17,11 +17,133 @@ export default function Login() {
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const loginMutation = useMutation({
-    mutationFn: async (phone: string) => {
-      const res = await apiRequest("POST", "/api/auth/login", { phoneNumber: phone });
-      const result = await res.json();
-      return { ...result, phone };
-    },
+  mutationFn: async (phone: string) => {
+    const { data, error } = await supabase.rpc(
+      "find_user_by_phone",
+      {
+        p_phone_number: phone,
+      }
+    );
+
+    if (error) {
+      throw error;
+    }
+
+const dbUser = Array.isArray(data) ? data[0] : data;
+
+if (!dbUser) {
+  return {
+    exists: false,
+    user: undefined,
+    phone,
+  };
+}
+
+const user = {
+  id: dbUser.id,
+
+  phoneNumber:
+    dbUser.phone_number ??
+    dbUser.phoneNumber ??
+    phone,
+
+  name:
+    dbUser.name ??
+    "",
+
+  userType:
+    dbUser.user_type ??
+    dbUser.userType ??
+    null,
+
+  location:
+    dbUser.location ??
+    null,
+
+  latitude:
+    dbUser.latitude ??
+    null,
+
+  longitude:
+    dbUser.longitude ??
+    null,
+
+  skills:
+    Array.isArray(dbUser.skills)
+      ? dbUser.skills
+      : [],
+
+  skillLevel:
+    dbUser.skill_level ??
+    dbUser.skillLevel ??
+    null,
+
+  hourlyRate:
+    dbUser.hourly_rate ??
+    dbUser.hourlyRate ??
+    null,
+
+  gender:
+    dbUser.gender ??
+    null,
+
+  dateOfBirth:
+    dbUser.date_of_birth ??
+    dbUser.dateOfBirth ??
+    null,
+
+  expectedDailySalary:
+    dbUser.expected_daily_salary ??
+    dbUser.expectedDailySalary ??
+    null,
+
+  travelDistance:
+    dbUser.travel_distance ??
+    dbUser.travelDistance ??
+    null,
+
+  comfortableStaying:
+    dbUser.comfortable_staying ??
+    dbUser.comfortableStaying ??
+    null,
+
+  aadharFrontUrl:
+    dbUser.aadhar_front_url ??
+    dbUser.aadharFrontUrl ??
+    null,
+
+  aadharBackUrl:
+    dbUser.aadhar_back_url ??
+    dbUser.aadharBackUrl ??
+    null,
+
+  averageRating:
+    dbUser.average_rating ??
+    dbUser.averageRating ??
+    null,
+
+  jobsCompleted:
+    dbUser.jobs_completed ??
+    dbUser.jobsCompleted ??
+    0,
+
+  totalRatings:
+    dbUser.total_ratings ??
+    dbUser.totalRatings ??
+    0,
+
+  createdAt:
+    dbUser.created_at ??
+    dbUser.createdAt ??
+    null,
+};
+
+return {
+  exists: true,
+  user,
+  phone,
+};
+  },
     onSuccess: (data: { exists: boolean; user?: any; phone: string }) => {
       if (data.exists && data.user) {
         setUser(data.user);

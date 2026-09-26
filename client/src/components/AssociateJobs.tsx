@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Search, Star, Briefcase, Calendar, MapPin, DollarSign, Users, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useUser } from "@/lib/userContext";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { supabase } from "@/lib/supabase";
 import SkillSelection from "@/components/SkillSelection";
 import { useLocationName } from "@/hooks/use-location-name";
 import type { Job } from "@shared/schema";
@@ -17,9 +21,48 @@ interface AssociateJobsProps {
   setSearchQuery: (query: string) => void;
 }
 
+const mapJobFromSupabase = (job: any): Job => ({
+  ...job,
+
+  id: job.id,
+
+  farmerId: job.farmer_id ?? job.farmerId,
+
+  serviceType: job.service_type ?? job.serviceType,
+
+  date: job.date,
+
+  time: job.time,
+
+  duration: job.duration,
+
+  associatesNeeded:
+    job.associates_needed ?? job.associatesNeeded,
+
+  skillLevel:
+    job.skill_level ?? job.skillLevel,
+
+  budget: job.budget,
+
+  latitude: job.latitude,
+
+  longitude: job.longitude,
+
+  location: job.location,
+
+  status: job.status,
+
+  createdAt:
+    job.created_at ?? job.createdAt,
+
+  updatedAt:
+    job.updated_at ?? job.updatedAt,
+});
+
 export default function AssociateJobs({ searchQuery, setSearchQuery }: AssociateJobsProps) {
   const { user } = useUser();
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"available" | "interested" | "shortlisted" | "completed">("available");
 
   // Check if user has selected skills
@@ -30,19 +73,89 @@ export default function AssociateJobs({ searchQuery, setSearchQuery }: Associate
                        user.latitude !== null && user.longitude !== null;
   
   const { data: nearbyJobs = [], isLoading: jobsLoading } = useQuery<Job[]>({
-    queryKey: ['/api/jobs/nearby', user?.latitude, user?.longitude],
-    queryFn: async () => {
-      const res = await fetch(`/api/jobs/nearby/${user?.latitude}/${user?.longitude}`);
-      if (!res.ok) throw new Error('Failed to fetch jobs');
-      return res.json();
-    },
-    enabled: Boolean(hasLocation && hasSkills),
-  });
+  queryKey: [
+    "fyndo-nearby-jobs",
+    user?.latitude,
+    user?.longitude,
+  ],
+
+  queryFn: async () => {
+    if (
+      user?.latitude === null ||
+      user?.latitude === undefined ||
+      user?.longitude === null ||
+      user?.longitude === undefined
+    ) {
+      return [];
+    }
+
+    const { data, error } = await supabase.rpc("get_nearby_jobs", {
+      user_lat: Number(user.latitude),
+      user_lon: Number(user.longitude),
+      radius_km: 20,
+    });
+
+    console.log("FYNDO DEBUG - nearbyJobs:", nearbyJobs);
+console.log("FYNDO DEBUG - user skills:", user?.skills);
+console.log("FYNDO DEBUG - user location:", {
+  latitude: user?.latitude,
+  longitude: user?.longitude,
+});
+
+    if (error) {
+      console.error("FYNDO nearby jobs error:", error);
+      throw error;
+    }
+    
+
+    return (data ?? []).map(mapJobFromSupabase);
+  },
+
+  enabled: Boolean(hasLocation && hasSkills),
+});
 
   // Fetch associate's interested jobs (returns JobInterest & { job: Job })
-  const { data: interestData = [], isLoading: interestsLoading } = useQuery<Array<{ jobId: string; status: string; job: Job }>>({
-    queryKey: [`/api/job-interests/associate/${user?.id}`],
-    enabled: Boolean(user && hasSkills),
+  interface AssociateInterest {
+  jobId: string;
+  status: string;
+  job: Job;
+}
+
+const { data: interestData = [], isLoading: interestsLoading } =
+  useQuery<AssociateInterest[]>({
+    queryKey: [
+      "fyndo-associate-interests",
+      user?.id,
+    ],
+
+    queryFn: async () => {
+      if (!user?.id) {
+        return [];
+      }
+
+      const { data, error } = await supabase.rpc(
+        "get_fyndo_associate_interests",
+        {
+          p_associate_id: user.id,
+        }
+      );
+
+      if (error) {
+        console.error(
+          "FYNDO associate interests error:",
+          error
+        );
+        throw error;
+      }
+
+      return (data ?? []).map((item: any) => ({
+        jobId: item.job_id,
+        status: item.status,
+        job: item.job,
+      }));
+    },
+
+    enabled: Boolean(user?.id && hasSkills),
   });
 
   // Track dismissed jobs using React state (synced with localStorage)
@@ -80,20 +193,56 @@ export default function AssociateJobs({ searchQuery, setSearchQuery }: Associate
 
   // Express interest mutation
   const expressInterestMutation = useMutation({
-    mutationFn: async ({ jobId }: { jobId: string }) => {
-      const res = await apiRequest("POST", "/api/job-interests", {
-        jobId,
-        associateId: user?.id,
-      });
-      return await res.json();
-    },
-    onSuccess: (_, { jobId }) => {
-      // If the job was previously dismissed, remove it from dismissed list
-      undismissJob(jobId);
-      queryClient.invalidateQueries({ queryKey: [`/api/job-interests/associate/${user?.id}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/jobs/nearby'] });
-    },
-  });
+  mutationFn: async ({ jobId }: { jobId: string }) => {
+    if (!user?.id) {
+      throw new Error("Associate ID is missing");
+    }
+
+    const { data, error } = await supabase.rpc(
+      "create_fyndo_job_interest",
+      {
+        p_job_id: jobId,
+        p_associate_id: user.id,
+      }
+    );
+
+    if (error) {
+      console.error(
+        "FYNDO create job interest error:",
+        error
+      );
+      throw error;
+    }
+
+    return data;
+  },
+
+  onSuccess: (_, { jobId }) => {
+    undismissJob(jobId);
+
+    queryClient.invalidateQueries({
+      queryKey: [
+        "fyndo-associate-interests",
+        user?.id,
+      ],
+    });
+
+    queryClient.invalidateQueries({
+      queryKey: [
+        "fyndo-nearby-jobs",
+        user?.latitude,
+        user?.longitude,
+      ],
+    });
+  },
+
+  onError: (error) => {
+    console.error(
+      "FYNDO express interest failed:",
+      error
+    );
+  },
+});
 
   if (!hasSkills) {
     return <SkillSelection />;
@@ -142,6 +291,8 @@ export default function AssociateJobs({ searchQuery, setSearchQuery }: Associate
     if (normalizedUserSkills.length > 0 && !normalizedUserSkills.includes(job.serviceType.toLowerCase())) return false;
     return true;
   });
+  
+  console.log("FYNDO DEBUG - availableJobs:", availableJobs);
   
   // Other tabs are NOT affected by dismissedJobIds - they show all jobs user has interacted with
   const interestedJobs = interestData

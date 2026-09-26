@@ -6,6 +6,7 @@ import MetricCard from "@/components/MetricCard";
 import JobCard from "@/components/JobCard";
 import BottomNav from "@/components/BottomNav";
 import { useUser } from "@/lib/userContext";
+import { supabase } from "@/lib/supabase";
 import { DollarSign, Briefcase, Star, Clock, CheckCircle, Plus, Bell } from "lucide-react";
 import type { Job, JobInterest } from "@shared/schema";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -15,16 +16,133 @@ export default function Dashboard() {
   const { user } = useUser();
 
   const { data: jobs = [], isLoading } = useQuery<Job[]>({
-    queryKey: user?.userType === "farmer" 
-      ? ["/api/jobs/farmer", user?.id]
-      : ["/api/jobs/nearby", user?.latitude, user?.longitude],
-    enabled: !!user && (user.userType === "farmer" || (!!user.latitude && !!user.longitude)),
-  });
+  queryKey:
+    user?.userType === "farmer"
+      ? ["farmer-jobs", user?.id]
+      : ["nearby-jobs", user?.latitude, user?.longitude],
 
-  const { data: associateInterests = [] } = useQuery<Array<JobInterest & { job: Job }>>({
-    queryKey: ["/api/job-interests/associate", user?.id],
-    enabled: !!user && user?.userType === "associate",
-  });
+  enabled:
+    !!user &&
+    (user.userType === "farmer" ||
+      (!!user.latitude && !!user.longitude)),
+
+  queryFn: async () => {
+    if (!user) {
+      return [];
+    }
+
+    if (user.userType === "farmer") {
+      const { data, error } = await supabase.rpc(
+        "get_farmer_jobs",
+        {
+          p_farmer_id: user.id,
+        }
+      );
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? []).map((job: any) => ({
+        ...job,
+        farmerId: job.farmer_id ?? job.farmerId,
+        serviceType: job.service_type ?? job.serviceType,
+        associatesNeeded:
+          job.associates_needed ?? job.associatesNeeded,
+        skillLevel: job.skill_level ?? job.skillLevel,
+        paymentMethod:
+          job.payment_method ?? job.paymentMethod,
+        jobComment: job.job_comment ?? job.jobComment,
+        createdAt: job.created_at ?? job.createdAt,
+        updatedAt: job.updated_at ?? job.updatedAt,
+      })) as Job[];
+    }
+
+    const { data, error } = await supabase.rpc(
+      "get_nearby_jobs",
+      {
+        user_lat: Number(user.latitude),
+        user_lon: Number(user.longitude),
+        radius_km: 20,
+      }
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    return (data ?? []).map((job: any) => ({
+      ...job,
+      farmerId: job.farmer_id ?? job.farmerId,
+      serviceType: job.service_type ?? job.serviceType,
+      associatesNeeded:
+        job.associates_needed ?? job.associatesNeeded,
+      skillLevel: job.skill_level ?? job.skillLevel,
+      paymentMethod:
+        job.payment_method ?? job.paymentMethod,
+      jobComment: job.job_comment ?? job.jobComment,
+      createdAt: job.created_at ?? job.createdAt,
+      updatedAt: job.updated_at ?? job.updatedAt,
+    })) as Job[];
+  },
+});
+
+ const { data: associateInterests = [] } = useQuery<
+  Array<JobInterest & { job: Job }>
+>({
+  queryKey: ["associate-interests", user?.id],
+
+  enabled:
+    !!user &&
+    user.userType === "associate",
+
+  queryFn: async () => {
+    if (!user) {
+      return [];
+    }
+
+    const { data, error } = await supabase.rpc(
+      "get_fyndo_associate_interests",
+      {
+        p_associate_id: user.id,
+      }
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    return (data ?? []).map((item: any) => ({
+      jobId: item.job_id,
+      status: item.status,
+      job: {
+        ...item.job,
+        farmerId:
+          item.job.farmer_id ?? item.job.farmerId,
+        serviceType:
+          item.job.service_type ?? item.job.serviceType,
+        associatesNeeded:
+          item.job.associates_needed ??
+          item.job.associatesNeeded,
+        skillLevel:
+          item.job.skill_level ??
+          item.job.skillLevel,
+        paymentMethod:
+          item.job.payment_method ??
+          item.job.paymentMethod,
+        jobComment:
+          item.job.job_comment ??
+          item.job.jobComment,
+        createdAt:
+          item.job.created_at ??
+          item.job.createdAt,
+        updatedAt:
+          item.job.updated_at ??
+          item.job.updatedAt,
+      },
+    })) as Array<JobInterest & { job: Job }>;
+  },
+});
 
   const shortlistedJobsCount = user?.userType === "associate" 
     ? associateInterests.filter((interest) => interest.status.toLowerCase() === "shortlisted").length 

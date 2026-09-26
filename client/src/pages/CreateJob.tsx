@@ -11,7 +11,8 @@ import ServiceTypeGrid from "@/components/ServiceTypeGrid";
 import { Card, CardContent } from "@/components/ui/card";
 import { useUser } from "@/lib/userContext";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { supabase } from "@/lib/supabase";
+import { queryClient } from "@/lib/queryClient";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export default function CreateJob() {
@@ -30,21 +31,59 @@ export default function CreateJob() {
   });
 
   const createJobMutation = useMutation({
-    mutationFn: async (jobData: any) => {
-      const res = await apiRequest("POST", "/api/jobs", jobData);
-      return await res.json();
-    },
-    onSuccess: () => {
-      toast({ title: "Success!", description: "Job posted successfully", duration: 3000 });
-      if (user?.id) {
-        queryClient.invalidateQueries({ queryKey: ["/api/jobs/farmer", user.id] });
+  mutationFn: async (jobData: any) => {
+    const { data, error } = await supabase.rpc(
+      "create_fyndo_job",
+      {
+        p_farmer_id: jobData.farmerId,
+        p_service_type: jobData.serviceType,
+        p_date: jobData.date,
+        p_time: jobData.time,
+        p_duration: jobData.duration,
+        p_associates_needed: jobData.associatesNeeded,
+        p_skill_level: jobData.skillLevel,
+        p_budget: jobData.budget,
+        p_latitude: jobData.latitude,
+        p_longitude: jobData.longitude,
+        p_location: jobData.location,
       }
-      setLocation("/my-jobs");
-    },
-    onError: () => {
-      toast({ title: "Error", description: "Failed to create job", variant: "destructive", duration: 3000 });
-    },
-  });
+    );
+
+    if (error) {
+      console.error("FYNDO create job error:", error);
+      throw error;
+    }
+
+    return data;
+  },
+
+  onSuccess: () => {
+    toast({
+      title: "Success!",
+      description: "Job posted successfully",
+      duration: 3000,
+    });
+
+    if (user?.id) {
+      queryClient.invalidateQueries({
+        queryKey: ["farmer-jobs", user.id],
+      });
+    }
+
+    setLocation("/my-jobs");
+  },
+
+  onError: (error) => {
+    console.error("FYNDO create job failed:", error);
+
+    toast({
+      title: "Error",
+      description: "Failed to create job",
+      variant: "destructive",
+      duration: 3000,
+    });
+  },
+});
 
   const steps = ["Service", "Schedule", "Team", "Budget", "Review"];
 

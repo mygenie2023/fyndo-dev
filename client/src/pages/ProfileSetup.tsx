@@ -11,7 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import LocationPicker from "@/components/LocationPicker";
 import { useUser } from "@/lib/userContext";
 import { User, Tractor, ArrowLeft, Upload, Check, Loader2 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { supabase } from "@/lib/supabase";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useUpload } from "@/hooks/use-upload";
 
@@ -58,18 +58,80 @@ export default function ProfileSetup() {
   }, []);
 
   const profileMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const res = await apiRequest("POST", "/api/auth/complete-profile", data);
-      return await res.json();
-    },
-    onSuccess: (data: any) => {
-      setUser(data);
-      setLocation("/jobs");
-    },
-    onError: () => {
-      // Error occurred - profile will not be created
-    },
-  });
+  mutationFn: async (data: any) => {
+    // Step 1: Create the basic user
+    const { data: createdUser, error: createError } =
+      await supabase.rpc("create_fyndo_user", {
+        p_phone_number: data.phoneNumber,
+        p_name: data.name,
+        p_user_type: data.userType,
+      });
+
+    if (createError) {
+      throw createError;
+    }
+
+    if (!createdUser?.id) {
+      throw new Error("User was not created");
+    }
+
+    // Step 2: Complete the rest of the profile
+    const { data: updatedUser, error: updateError } =
+      await supabase.rpc("update_fyndo_user", {
+        p_user_id: createdUser.id,
+        p_name: data.name,
+        p_user_type: data.userType,
+        p_latitude: Number(data.latitude),
+        p_longitude: Number(data.longitude),
+        p_location: data.location,
+        p_skills: data.skills || [],
+        p_skill_level: data.skillLevel || null,
+        p_hourly_rate: data.hourlyRate ?? null,
+        p_gender: data.gender || null,
+        p_date_of_birth: data.dateOfBirth || null,
+        p_expected_daily_salary: data.expectedDailySalary ?? null,
+        p_travel_distance: data.travelDistance ?? null,
+        p_comfortable_staying: data.comfortableStaying || null,
+        p_aadhar_front_url: data.aadharFrontUrl || null,
+        p_aadhar_back_url: data.aadharBackUrl || null,
+      });
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return updatedUser;
+  },
+
+ onSuccess: (data: any) => {
+  const user = {
+    ...data,
+    phoneNumber: data.phone_number,
+    userType: data.user_type,
+    skillLevel: data.skill_level,
+    hourlyRate: data.hourly_rate,
+    dateOfBirth: data.date_of_birth,
+    expectedDailySalary: data.expected_daily_salary,
+    travelDistance: data.travel_distance,
+    comfortableStaying: data.comfortable_staying,
+    aadharFrontUrl: data.aadhar_front_url,
+    aadharBackUrl: data.aadhar_back_url,
+    averageRating: data.average_rating,
+    totalRatings: data.total_ratings,
+    jobsCompleted: data.jobs_completed,
+    totalEarnings: data.total_earnings,
+    pendingPayments: data.pending_payments,
+    createdAt: data.created_at,
+  };
+
+  setUser(user);
+  setLocation("/jobs");
+},
+
+  onError: (error) => {
+    console.error("FYNDO profile creation error:", error);
+  },
+});
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
