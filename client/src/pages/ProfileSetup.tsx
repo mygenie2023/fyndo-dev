@@ -1,4 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -6,6 +11,7 @@ import {
   ArrowLeft,
   Check,
   Loader2,
+  MapPin,
   Tractor,
   Upload,
   User,
@@ -45,8 +51,13 @@ export default function ProfileSetup() {
   // ---------------------------------------------------------------------------
   // LOCATION
   //
-  // Latitude/longitude are captured automatically from browser GPS.
-  // They are intentionally kept separate from the editable location name.
+  // GPS coordinates are mandatory.
+  //
+  // Coordinates are captured automatically when the Location step opens.
+  // The user can also explicitly tap "Select Location" to retry/fetch the
+  // current location.
+  //
+  // Latitude/longitude remain separate from the editable location name.
   // ---------------------------------------------------------------------------
 
   const [selectedLocation, setSelectedLocation] = useState<{
@@ -66,7 +77,6 @@ export default function ProfileSetup() {
     "farmer" | "associate" | null
   >(null);
 
-  // Associate-specific fields
   const [gender, setGender] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [expectedDailySalary, setExpectedDailySalary] =
@@ -76,7 +86,6 @@ export default function ProfileSetup() {
   const [comfortableStaying, setComfortableStaying] =
     useState("");
 
-  // Aadhaar KYC uploads
   const [aadharFrontUrl, setAadharFrontUrl] =
     useState("");
   const [aadharBackUrl, setAadharBackUrl] =
@@ -129,28 +138,11 @@ export default function ProfileSetup() {
     (userType === "associate" && currentStep === 4);
 
   // ---------------------------------------------------------------------------
-  // AUTOMATIC GPS + REVERSE GEOCODING
-  //
-  // This runs automatically when the Location step opens.
-  //
-  // Coordinates are captured once and stored in selectedLocation.
-  // locationName is populated from reverse geocoding but remains editable.
-  // Editing locationName does NOT modify selectedLocation.
+  // REVERSE GEOCODING
   // ---------------------------------------------------------------------------
 
-  useEffect(() => {
-    if (!isLocationStep) {
-      return;
-    }
-
-    // Don't request GPS again if it has already been captured.
-    if (selectedLocation) {
-      return;
-    }
-
-    let cancelled = false;
-
-    const reverseGeocode = async (
+  const reverseGeocode = useCallback(
+    async (
       latitude: number,
       longitude: number
     ): Promise<string> => {
@@ -176,11 +168,6 @@ export default function ProfileSetup() {
       }
 
       const data = await response.json();
-
-      /*
-       * Prefer a concise human-readable locality instead of
-       * displaying the complete postal address.
-       */
       const address = data?.address ?? {};
 
       const locality =
@@ -215,127 +202,125 @@ export default function ProfileSetup() {
       }
 
       return "";
-    };
+    },
+    []
+  );
 
-    const detectLocation = () => {
-      if (!navigator.geolocation) {
-        setLocationError(
-          "Location services are not supported by this browser."
-        );
-        return;
-      }
+  // ---------------------------------------------------------------------------
+  // DETECT LOCATION
+  //
+  // Used both for automatic background GPS detection and the explicit
+  // "Select Location" button.
+  // ---------------------------------------------------------------------------
 
-      setDetectingLocation(true);
-      setLocationError("");
+  const detectLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationError(
+        "Location services are not supported by this browser. Please enable location services or use a device/browser that supports location detection."
+      );
+      return;
+    }
 
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          if (cancelled) {
-            return;
-          }
+    setDetectingLocation(true);
+    setLocationError("");
 
-          const latitude =
-            position.coords.latitude;
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const latitude =
+          position.coords.latitude;
 
-          const longitude =
-            position.coords.longitude;
+        const longitude =
+          position.coords.longitude;
 
-          /*
-           * Store coordinates immediately.
-           *
-           * These coordinates remain fixed even if the user
-           * edits the Location name below.
-           */
-          setSelectedLocation({
-            lat: latitude,
-            lng: longitude,
-          });
+        setSelectedLocation({
+          lat: latitude,
+          lng: longitude,
+        });
 
-          try {
-            const detectedName =
-              await reverseGeocode(
-                latitude,
-                longitude
-              );
-
-            if (
-              !cancelled &&
-              detectedName
-            ) {
-              setLocationName(
-                detectedName
-              );
-            }
-          } catch (error) {
-            console.error(
-              "Reverse geocoding failed:",
-              error
+        try {
+          const detectedName =
+            await reverseGeocode(
+              latitude,
+              longitude
             );
 
-            if (!cancelled) {
-              setLocationError(
-                "Your location was detected, but we couldn't determine the place name. Please enter the location name manually."
-              );
-            }
-          } finally {
-            if (!cancelled) {
-              setDetectingLocation(false);
-            }
+          if (detectedName) {
+            setLocationName(
+              detectedName
+            );
           }
-        },
-        (error) => {
-          if (cancelled) {
-            return;
-          }
-
+        } catch (error) {
           console.error(
-            "Browser location detection failed:",
+            "Reverse geocoding failed:",
             error
           );
 
+          setLocationError(
+            "Your location was detected, but we couldn't determine the place name. Please enter the location name manually."
+          );
+        } finally {
           setDetectingLocation(false);
-
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              setLocationError(
-                "Location permission was denied. Please allow location access in your browser to continue."
-              );
-              break;
-
-            case error.POSITION_UNAVAILABLE:
-              setLocationError(
-                "Your current location could not be determined. Please try again."
-              );
-              break;
-
-            case error.TIMEOUT:
-              setLocationError(
-                "Location detection timed out. Please try again."
-              );
-              break;
-
-            default:
-              setLocationError(
-                "We couldn't detect your location. Please try again."
-              );
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 0,
         }
-      );
-    };
+      },
+      (error) => {
+        console.error(
+          "Browser location detection failed:",
+          error
+        );
+
+        setDetectingLocation(false);
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            setLocationError(
+              "Location access was denied. Please enable location permission in your browser or device settings, then tap Select Location again."
+            );
+            break;
+
+          case error.POSITION_UNAVAILABLE:
+            setLocationError(
+              "Your current location could not be determined. Please check your device location settings and tap Select Location again."
+            );
+            break;
+
+          case error.TIMEOUT:
+            setLocationError(
+              "Location detection timed out. Please try Select Location again."
+            );
+            break;
+
+          default:
+            setLocationError(
+              "We couldn't detect your location. Please try Select Location again."
+            );
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+      }
+    );
+  }, [reverseGeocode]);
+
+  // ---------------------------------------------------------------------------
+  // AUTOMATIC GPS DETECTION
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (!isLocationStep) {
+      return;
+    }
+
+    if (selectedLocation) {
+      return;
+    }
 
     detectLocation();
-
-    return () => {
-      cancelled = true;
-    };
   }, [
     isLocationStep,
     selectedLocation,
+    detectLocation,
   ]);
 
   // ---------------------------------------------------------------------------
@@ -352,10 +337,8 @@ export default function ProfileSetup() {
         {
           p_phone_number:
             data.phoneNumber,
-
           p_name:
             data.name,
-
           p_user_type:
             data.userType,
         }
@@ -379,53 +362,38 @@ export default function ProfileSetup() {
         {
           p_user_id:
             createdUser.id,
-
           p_name:
             data.name,
-
           p_user_type:
             data.userType,
-
           p_latitude:
             Number(data.latitude),
-
           p_longitude:
             Number(data.longitude),
-
           p_location:
             data.location,
-
           p_skills:
             data.skills || [],
-
           p_skill_level:
             data.skillLevel || null,
-
           p_hourly_rate:
             data.hourlyRate ?? null,
-
           p_gender:
             data.gender || null,
-
           p_date_of_birth:
             data.dateOfBirth || null,
-
           p_expected_daily_salary:
             data.expectedDailySalary ??
             null,
-
           p_travel_distance:
             data.travelDistance ??
             null,
-
           p_comfortable_staying:
             data.comfortableStaying ||
             null,
-
           p_aadhar_front_url:
             data.aadharFrontUrl ||
             null,
-
           p_aadhar_back_url:
             data.aadharBackUrl ||
             null,
@@ -440,36 +408,50 @@ export default function ProfileSetup() {
     },
 
     onSuccess: (data: any) => {
-  const user = {
-    ...data,
-    phoneNumber: data.phone_number,
-    userType: data.user_type,
-    skillLevel: data.skill_level,
-    hourlyRate: data.hourly_rate,
-    dateOfBirth: data.date_of_birth,
-    expectedDailySalary: data.expected_daily_salary,
-    travelDistance: data.travel_distance,
-    comfortableStaying: data.comfortable_staying,
-    aadharFrontUrl: data.aadhar_front_url,
-    aadharBackUrl: data.aadhar_back_url,
-    averageRating: data.average_rating,
-    totalRatings: data.total_ratings,
-    jobsCompleted: data.jobs_completed,
-    totalEarnings: data.total_earnings,
-    pendingPayments: data.pending_payments,
-    createdAt: data.created_at,
-  };
+      const user = {
+        ...data,
+        phoneNumber: data.phone_number,
+        userType: data.user_type,
+        skillLevel: data.skill_level,
+        hourlyRate: data.hourly_rate,
+        dateOfBirth: data.date_of_birth,
+        expectedDailySalary:
+          data.expected_daily_salary,
+        travelDistance:
+          data.travel_distance,
+        comfortableStaying:
+          data.comfortable_staying,
+        aadharFrontUrl:
+          data.aadhar_front_url,
+        aadharBackUrl:
+          data.aadhar_back_url,
+        averageRating:
+          data.average_rating,
+        totalRatings:
+          data.total_ratings,
+        jobsCompleted:
+          data.jobs_completed,
+        totalEarnings:
+          data.total_earnings,
+        pendingPayments:
+          data.pending_payments,
+        createdAt:
+          data.created_at,
+      };
 
-  setUser(user);
+      setUser(user);
 
-  if (data.user_type?.toLowerCase() === "farmer") {
-    // Farmer → open Post a Job once
-    setLocation("/jobs?createJob=true");
-  } else {
-    // Associate → go to Jobs, where Select Your Skills is displayed
-    setLocation("/jobs");
-  }
-},
+      if (
+        data.user_type?.toLowerCase() ===
+        "farmer"
+      ) {
+        setLocation(
+          "/jobs?createJob=true"
+        );
+      } else {
+        setLocation("/jobs");
+      }
+    },
 
     onError: (error) => {
       console.error(
@@ -615,22 +597,10 @@ export default function ProfileSetup() {
       name,
       phoneNumber,
       userType,
-
-      /*
-       * These coordinates came from browser GPS.
-       *
-       * They are intentionally independent from locationName.
-       */
       latitude:
-        selectedLocation.lat.toString(),
-
+        selectedLocation.lat,
       longitude:
-        selectedLocation.lng.toString(),
-
-      /*
-       * This is the editable human-readable
-       * location name.
-       */
+        selectedLocation.lng,
       location:
         locationName.trim(),
     };
@@ -638,35 +608,25 @@ export default function ProfileSetup() {
     if (userType === "associate") {
       profileMutation.mutate({
         ...baseData,
-
         skills: [],
-
         skillLevel:
           "Beginner",
-
         hourlyRate:
           100,
-
         gender,
-
         dateOfBirth,
-
         expectedDailySalary:
           parseInt(
             expectedDailySalary
           ) || 0,
-
         travelDistance:
           parseInt(
             travelDistance
           ) || 0,
-
         comfortableStaying,
-
         aadharFrontUrl:
           aadharFrontUrl ||
           undefined,
-
         aadharBackUrl:
           aadharBackUrl ||
           undefined,
@@ -759,18 +719,12 @@ export default function ProfileSetup() {
 
   return (
     <div className="min-h-screen bg-[#FDFCF7] text-[#1F372E]">
-      {/* Decorative background */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -right-32 -top-32 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
-
         <div className="absolute -bottom-40 -left-32 h-96 w-96 rounded-full bg-[#E7F0EB] blur-3xl" />
       </div>
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-xl flex-col px-5 pb-6 sm:px-6">
-        {/* ------------------------------------------------------------------ */}
-        {/* HEADER                                                             */}
-        {/* ------------------------------------------------------------------ */}
-
         <header className="flex items-center justify-between py-5">
           <button
             type="button"
@@ -791,7 +745,6 @@ export default function ProfileSetup() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6B7D75]">
               Profile Setup
             </p>
-
             <p className="mt-0.5 text-xs font-medium text-[#7C8C85]">
               Step {currentStep} of{" "}
               {totalSteps}
@@ -799,17 +752,9 @@ export default function ProfileSetup() {
           </div>
         </header>
 
-        {/* ------------------------------------------------------------------ */}
-        {/* PROGRESS                                                           */}
-        {/* ------------------------------------------------------------------ */}
-
         <div className="mb-7">
           {renderProgress()}
         </div>
-
-        {/* ------------------------------------------------------------------ */}
-        {/* MAIN CONTENT                                                       */}
-        {/* ------------------------------------------------------------------ */}
 
         <main className="flex-1">
           <div className="mb-6">
@@ -821,10 +766,6 @@ export default function ProfileSetup() {
               {stepDescription()}
             </p>
           </div>
-
-          {/* ================================================================ */}
-          {/* STEP 1                                                           */}
-          {/* ================================================================ */}
 
           {currentStep === 1 && (
             <section className="animate-in fade-in duration-300">
@@ -865,13 +806,8 @@ export default function ProfileSetup() {
             </section>
           )}
 
-          {/* ================================================================ */}
-          {/* STEP 2                                                           */}
-          {/* ================================================================ */}
-
           {currentStep === 2 && (
             <section className="space-y-4 animate-in fade-in duration-300">
-              {/* Farmer */}
               <button
                 type="button"
                 onClick={() => {
@@ -932,7 +868,6 @@ export default function ProfileSetup() {
                 </div>
               </button>
 
-              {/* Associate */}
               <button
                 type="button"
                 onClick={() => {
@@ -998,16 +933,11 @@ export default function ProfileSetup() {
             </section>
           )}
 
-          {/* ================================================================ */}
-          {/* ASSOCIATE STEP 3                                                 */}
-          {/* ================================================================ */}
-
           {currentStep === 3 &&
             userType === "associate" && (
               <section className="space-y-4 animate-in fade-in duration-300">
                 <div className="rounded-3xl border border-[#DDE7E3] bg-white p-5 shadow-[0_12px_32px_rgba(31,55,46,0.06)] sm:p-6">
                   <div className="space-y-5">
-                    {/* Gender */}
                     <div className="space-y-2">
                       <Label className="text-sm font-semibold text-[#1F372E]">
                         {t(
@@ -1041,14 +971,12 @@ export default function ProfileSetup() {
                               "Male"
                             )}
                           </SelectItem>
-
                           <SelectItem value="female">
                             {t(
                               "profileSetup.female",
                               "Female"
                             )}
                           </SelectItem>
-
                           <SelectItem value="other">
                             {t(
                               "profileSetup.other",
@@ -1059,7 +987,6 @@ export default function ProfileSetup() {
                       </Select>
                     </div>
 
-                    {/* Date of Birth */}
                     <div className="space-y-2">
                       <Label
                         htmlFor="date-of-birth"
@@ -1097,7 +1024,6 @@ export default function ProfileSetup() {
                       />
                     </div>
 
-                    {/* Salary */}
                     <div className="space-y-2">
                       <Label
                         htmlFor="expected-salary"
@@ -1136,7 +1062,6 @@ export default function ProfileSetup() {
                       </div>
                     </div>
 
-                    {/* Travel Distance */}
                     <div className="space-y-3">
                       <Label className="text-sm font-semibold text-[#1F372E]">
                         {t(
@@ -1186,7 +1111,6 @@ export default function ProfileSetup() {
                       </div>
                     </div>
 
-                    {/* Comfortable Staying */}
                     <div className="space-y-3">
                       <Label className="text-sm font-semibold text-[#1F372E]">
                         {t(
@@ -1218,7 +1142,6 @@ export default function ProfileSetup() {
                             id="stay-yes"
                             data-testid="radio-stay-yes"
                           />
-
                           <span className="text-sm font-medium text-[#1F372E]">
                             {t(
                               "profileSetup.yes",
@@ -1241,7 +1164,6 @@ export default function ProfileSetup() {
                             id="stay-no"
                             data-testid="radio-stay-no"
                           />
-
                           <span className="text-sm font-medium text-[#1F372E]">
                             {t(
                               "profileSetup.no",
@@ -1254,7 +1176,6 @@ export default function ProfileSetup() {
                   </div>
                 </div>
 
-                {/* KYC */}
                 <div className="rounded-3xl border border-[#DDE7E3] bg-white p-5 shadow-[0_12px_32px_rgba(31,55,46,0.06)] sm:p-6">
                   <div className="mb-5">
                     <div className="flex items-start gap-3">
@@ -1284,7 +1205,6 @@ export default function ProfileSetup() {
                   </div>
 
                   <div className="space-y-3">
-                    {/* Front */}
                     <div className="rounded-2xl border border-[#DDE7E3] bg-[#FBFCFB] p-4">
                       <div className="mb-3 flex items-center justify-between gap-3">
                         <div>
@@ -1294,7 +1214,6 @@ export default function ProfileSetup() {
                               "Aadhar Front Side"
                             )}
                           </p>
-
                           <p className="mt-0.5 text-xs text-[#7C8C85]">
                             JPG or PNG
                           </p>
@@ -1368,7 +1287,6 @@ export default function ProfileSetup() {
                       </Button>
                     </div>
 
-                    {/* Back */}
                     <div className="rounded-2xl border border-[#DDE7E3] bg-[#FBFCFB] p-4">
                       <div className="mb-3 flex items-center justify-between gap-3">
                         <div>
@@ -1378,7 +1296,6 @@ export default function ProfileSetup() {
                               "Aadhar Back Side"
                             )}
                           </p>
-
                           <p className="mt-0.5 text-xs text-[#7C8C85]">
                             JPG or PNG
                           </p>
@@ -1456,11 +1373,6 @@ export default function ProfileSetup() {
               </section>
             )}
 
-          {/* ================================================================ */}
-          {/* LOCATION                                                         */}
-          {/* ONLY THIS SECTION HAS BEEN CHANGED                              */}
-          {/* ================================================================ */}
-
           {((currentStep === 3 &&
             userType === "farmer") ||
             (currentStep === 4 &&
@@ -1484,17 +1396,40 @@ export default function ProfileSetup() {
                       )
                     }
                     placeholder="Enter your location name"
-                    disabled={
-                      !selectedLocation
-                    }
-                    className="h-12 rounded-xl border-[#DDE7E3] bg-[#FBFCFB] px-4 text-base shadow-none focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="h-12 rounded-xl border-[#DDE7E3] bg-[#FBFCFB] px-4 text-base shadow-none focus-visible:ring-primary/20"
                     data-testid="input-location-name"
                   />
+
+                  <p className="text-xs leading-5 text-[#7C8C85]">
+                    We’ll detect your location automatically.
+                    You can also use Select Location to fetch
+                    your current location again.
+                  </p>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={detectLocation}
+                    disabled={detectingLocation}
+                    className="h-11 w-full rounded-xl border-[#DDE7E3] bg-white"
+                    data-testid="button-select-location"
+                  >
+                    {detectingLocation ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Detecting Location...
+                      </>
+                    ) : (
+                      <>
+                        <MapPin className="mr-2 h-4 w-4" />
+                        Select Location
+                      </>
+                    )}
+                  </Button>
 
                   {detectingLocation && (
                     <div className="flex items-center gap-2 pt-1 text-xs text-[#7C8C85]">
                       <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-
                       <span>
                         Detecting your location...
                       </span>
@@ -1507,15 +1442,21 @@ export default function ProfileSetup() {
                         {locationError}
                       </p>
                     )}
+
+                  {!detectingLocation &&
+                    selectedLocation && (
+                      <div className="flex items-center gap-2 pt-1 text-xs text-primary">
+                        <Check className="h-3.5 w-3.5" />
+                        <span>
+                          GPS location captured successfully.
+                        </span>
+                      </div>
+                    )}
                 </div>
               </div>
             </section>
           )}
         </main>
-
-        {/* ------------------------------------------------------------------ */}
-        {/* NAVIGATION BUTTONS                                                */}
-        {/* ------------------------------------------------------------------ */}
 
         <div className="mt-6 flex gap-3">
           {currentStep > 1 && (
@@ -1566,7 +1507,6 @@ export default function ProfileSetup() {
               {profileMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-
                   {t(
                     "profileSetup.creating"
                   )}
@@ -1576,7 +1516,6 @@ export default function ProfileSetup() {
                   {t(
                     "profileSetup.submit"
                   )}
-
                   <Check className="ml-2 h-4 w-4" />
                 </>
               )}
@@ -1584,7 +1523,6 @@ export default function ProfileSetup() {
           )}
         </div>
 
-        {/* Profile creation error */}
         {profileMutation.isError && (
           <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
             We couldn't complete your
