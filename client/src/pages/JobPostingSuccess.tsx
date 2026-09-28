@@ -16,7 +16,6 @@ export default function JobPostingSuccess() {
         <div className="flex items-center gap-2">
           <img src={fyndoLogo} alt="FYNDO" className="h-8" data-testid="img-logo" />
         </div>
-        <LanguageSwitcher />
       </div>
 
       {/* Success Content */}

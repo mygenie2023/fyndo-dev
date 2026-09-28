@@ -12,7 +12,6 @@ import { supabase } from "@/lib/supabase";
 import {
   ArrowLeft,
   Calendar,
-  Clock,
   Users,
   DollarSign,
   MapPin,
@@ -21,10 +20,10 @@ import {
   Check,
   CheckCircle,
   Star,
+  BriefcaseBusiness,
 } from "lucide-react";
 import fyndoLogo from "@assets/FYNDO_v1.0_1770731684699.png";
 import BottomNav from "@/components/BottomNav";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useLocationName } from "@/hooks/use-location-name";
 import { useJobCompletion } from "@/hooks/use-job-completion";
 import {
@@ -146,28 +145,28 @@ export default function JobDetails() {
   // ---------------------------------------------------------------------------
 
   const {
-  data: interests = [],
-  isLoading: interestsLoading,
-} = useQuery<
-  Array<{
-    associate: User;
-    status: string;
-  }>
->({
-  queryKey: [
-    "job-interests",
-    jobId,
-  ],
+    data: interests = [],
+    isLoading: interestsLoading,
+  } = useQuery<
+    Array<{
+      associate: User;
+      status: string;
+    }>
+  >({
+    queryKey: [
+      "job-interests",
+      jobId,
+    ],
 
-  enabled:
-    !!jobId &&
-    user?.userType === "farmer",
+    enabled:
+      !!jobId &&
+      user?.userType === "farmer",
 
-  staleTime: 0,
+    staleTime: 0,
 
-  refetchOnMount: "always",
+    refetchOnMount: "always",
 
-  queryFn: async () => {
+    queryFn: async () => {
       const {
         data,
         error,
@@ -320,10 +319,8 @@ export default function JobDetails() {
             "update_fyndo_job_interest",
             {
               p_job_id: jobId,
-
               p_associate_id:
                 associateId,
-
               p_status:
                 status,
             }
@@ -374,14 +371,6 @@ export default function JobDetails() {
         associateId
       );
 
-    // -------------------------------------------------------------------------
-    // Remove shortlist
-    //
-    // IMPORTANT:
-    // Do NOT delete the job_interest record.
-    // Change status back to "interested".
-    // -------------------------------------------------------------------------
-
     if (
       isCurrentlyShortlisted
     ) {
@@ -406,10 +395,6 @@ export default function JobDetails() {
 
       return;
     }
-
-    // -------------------------------------------------------------------------
-    // Shortlist
-    // -------------------------------------------------------------------------
 
     if (
       job &&
@@ -437,9 +422,6 @@ export default function JobDetails() {
 
       return;
     }
-
-    // Maximum number reached.
-    return;
   };
 
   // ---------------------------------------------------------------------------
@@ -454,6 +436,7 @@ export default function JobDetails() {
 
   const confirmCancelJob = () => {
     updateJobMutation.mutate();
+
     setShowCancelDialog(
       false
     );
@@ -505,45 +488,45 @@ export default function JobDetails() {
   ]);
 
   // ---------------------------------------------------------------------------
-// Real-time Job Interest Updates
-// ---------------------------------------------------------------------------
+  // Real-time Job Interest Updates
+  // ---------------------------------------------------------------------------
 
-useEffect(() => {
-  if (
-    !jobId ||
-    user?.userType !== "farmer"
-  ) {
-    return;
-  }
+  useEffect(() => {
+    if (
+      !jobId ||
+      user?.userType !== "farmer"
+    ) {
+      return;
+    }
 
-  const channel = supabase
-    .channel(`job-interests-${jobId}`)
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "job_interests",
-        filter: `job_id=eq.${jobId}`,
-      },
-      () => {
-        queryClient.invalidateQueries({
-          queryKey: [
-            "job-interests",
-            jobId,
-          ],
-        });
-      }
-    )
-    .subscribe();
+    const channel = supabase
+      .channel(`job-interests-${jobId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "job_interests",
+          filter: `job_id=eq.${jobId}`,
+        },
+        () => {
+          queryClient.invalidateQueries({
+            queryKey: [
+              "job-interests",
+              jobId,
+            ],
+          });
+        }
+      )
+      .subscribe();
 
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, [
-  jobId,
-  user?.userType,
-]);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [
+    jobId,
+    user?.userType,
+  ]);
 
   // ---------------------------------------------------------------------------
   // Loading
@@ -554,10 +537,39 @@ useEffect(() => {
     interestsLoading
   ) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">
-          Loading job details...
-        </p>
+      <div className="min-h-screen bg-[#FDFCF7]">
+
+        <header className="sticky top-0 z-40 border-b border-[#DDE7E3] bg-white/95 shadow-sm backdrop-blur-xl">
+
+          <div className="mx-auto flex h-[4.5rem] max-w-2xl items-center justify-between px-5">
+
+            <button
+              type="button"
+              onClick={() =>
+                setLocation("/jobs")
+              }
+              className="rounded-lg transition-opacity hover:opacity-80"
+              aria-label="Go to FYNDO home"
+            >
+              <img
+                src={fyndoLogo}
+                alt="FYNDO"
+                className="h-8 w-auto"
+              />
+            </button>
+
+          </div>
+
+        </header>
+
+        <div className="flex min-h-[calc(100vh-4.5rem)] items-center justify-center px-6">
+
+          <p className="text-sm text-muted-foreground">
+            Loading job details...
+          </p>
+
+        </div>
+
       </div>
     );
   }
@@ -568,10 +580,39 @@ useEffect(() => {
 
   if (!job) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">
-          Job not found
-        </p>
+      <div className="min-h-screen bg-[#FDFCF7]">
+
+        <header className="sticky top-0 z-40 border-b border-[#DDE7E3] bg-white/95 shadow-sm backdrop-blur-xl">
+
+          <div className="mx-auto flex h-[4.5rem] max-w-2xl items-center justify-between px-5">
+
+            <button
+              type="button"
+              onClick={() =>
+                setLocation("/jobs")
+              }
+              className="rounded-lg transition-opacity hover:opacity-80"
+              aria-label="Go to FYNDO home"
+            >
+              <img
+                src={fyndoLogo}
+                alt="FYNDO"
+                className="h-8 w-auto"
+              />
+            </button>
+
+          </div>
+
+        </header>
+
+        <div className="flex min-h-[calc(100vh-4.5rem)] items-center justify-center px-6">
+
+          <p className="text-sm text-muted-foreground">
+            Job not found
+          </p>
+
+        </div>
+
       </div>
     );
   }
@@ -586,77 +627,80 @@ useEffect(() => {
     const config: Record<
       string,
       {
-        variant: any;
         label: string;
+        className: string;
       }
     > = {
       Open: {
-        variant:
-          "default",
-
-        label:
-          "Active",
+        label: "Active",
+        className:
+          "border-primary/20 bg-primary/10 text-primary",
       },
 
       Assigned: {
-        variant:
-          "default",
-
-        label:
-          "Active",
+        label: "Active",
+        className:
+          "border-primary/20 bg-primary/10 text-primary",
       },
 
       Cancelled: {
-        variant:
-          "destructive",
-
-        label:
-          "Cancelled",
+        label: "Cancelled",
+        className:
+          "border-red-200 bg-red-50 text-red-700",
       },
 
       Completed: {
-        variant:
-          "secondary",
-
-        label:
-          "Completed",
+        label: "Completed",
+        className:
+          "border-amber-200 bg-amber-50 text-amber-700",
       },
     };
 
     const {
-      variant,
       label,
+      className
     } =
       config[status] || {
-        variant:
-          "default",
-
-        label:
-          status,
+        label: status,
+        className:
+          "border-border bg-muted text-muted-foreground",
       };
 
     return (
       <Badge
-        variant={variant}
+        variant="outline"
+        className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${className}`}
       >
         {label}
       </Badge>
     );
   };
 
-  const interestedCount = interests.filter(
-  (interest) => {
-    const status =
-      interest.status?.toLowerCase();
+  const interestedCount =
+    interests.filter(
+      (interest) => {
+        const status =
+          interest.status?.toLowerCase();
 
-    return (
-      status === "interested" ||
-      status === "shortlisted"
+        return (
+          status === "interested" ||
+          status === "shortlisted"
+        );
+      }
+    ).length;
+
+  // ---------------------------------------------------------------------------
+  // Navigate to Associate Ratings
+  // ---------------------------------------------------------------------------
+
+  const openAssociateRatings = (
+    associateId: string
+  ) => {
+    setLocation(
+      `/associate-ratings/${associateId}?jobId=${jobId}`
     );
-  }
-).length;
+  };
 
-    
   // ---------------------------------------------------------------------------
   // Editing
   // ---------------------------------------------------------------------------
@@ -677,75 +721,102 @@ useEffect(() => {
   // ---------------------------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pb-24">
+    <div className="min-h-screen bg-[#FDFCF7] pb-24">
 
-      {/* ===================================================================== */}
       {/* Header */}
-      {/* ===================================================================== */}
 
-      <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-card-border/60 shadow-sm">
+      <header className="sticky top-0 z-40 border-b border-[#DDE7E3] bg-white/95 shadow-sm backdrop-blur-xl">
 
-        <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="mx-auto flex h-[4.5rem] max-w-2xl items-center justify-between gap-3 px-5">
 
-          <div className="flex items-center gap-3">
-
+          <button
+            type="button"
+            onClick={() =>
+              setLocation("/jobs")
+            }
+            className="flex items-center rounded-lg p-0 transition-opacity duration-200 hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            aria-label="Go to FYNDO home"
+            data-testid="button-fyndo-home"
+          >
             <img
               src={fyndoLogo}
               alt="FYNDO"
-              className="h-8"
+              className="h-8 w-auto"
               data-testid="img-logo"
             />
-
-          </div>
-
-          <LanguageSwitcher />
+          </button>
 
         </div>
 
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+      {/* Main Content */}
 
-        {/* =================================================================== */}
-        {/* Back Navigation */}
-        {/* =================================================================== */}
+      <main className="mx-auto max-w-2xl px-5 py-5">
+
+        {/* Back */}
 
         <Button
           variant="ghost"
           size="sm"
           onClick={() =>
-            setLocation(
-              "/jobs"
-            )
+            setLocation("/jobs")
           }
-          className="-ml-2"
+          className="-ml-2 mb-4 rounded-xl text-muted-foreground hover:bg-primary/5 hover:text-primary"
           data-testid="button-back"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Jobs
         </Button>
 
-        {/* =================================================================== */}
-        {/* Job Details Card */}
-        {/* =================================================================== */}
+        {/* ================================================================= */}
+        {/* Job Card */}
+        {/* ================================================================= */}
 
-        <Card>
+        <Card
+          className="
+            group cursor-pointer overflow-hidden rounded-3xl
+            border border-[#DCE7E3]
+            bg-white
+            shadow-[0_8px_28px_rgba(31,55,46,0.075)]
+            transition-all duration-300
+            hover:shadow-lift
+          "
+        >
 
-          <CardContent className="pt-6">
+          <CardContent className="p-5">
 
-            <div className="flex items-start justify-between gap-2 mb-4">
+            {/* Job Header */}
 
-              <div>
+            <div className="mb-5 flex items-start justify-between gap-3">
 
-                <h2 className="font-semibold text-base">
-                  {job.serviceType}
-                </h2>
+              <div className="min-w-0 flex-1">
 
-                <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                <div className="mb-2 flex min-w-0 items-center gap-2">
 
-                  <MapPin className="w-3 h-3" />
+                  <div className="shrink-0 rounded-xl bg-primary/10 p-2 ring-1 ring-primary/10">
 
-                  <span>
+                    <BriefcaseBusiness
+                      className="h-4 w-4 text-primary"
+                      strokeWidth={2.25}
+                    />
+
+                  </div>
+
+                  <h1 className="min-w-0 truncate font-display text-base font-bold tracking-tight text-[#1F372E]">
+                    {job.serviceType}
+                  </h1>
+
+                </div>
+
+                <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
+
+                  <MapPin
+                    className="h-3.5 w-3.5 shrink-0 text-primary"
+                    strokeWidth={2.25}
+                  />
+
+                  <span className="truncate">
                     {locationName}
                   </span>
 
@@ -753,94 +824,144 @@ useEffect(() => {
 
               </div>
 
-              {getStatusBadge(
-                job.status
-              )}
+              <div className="shrink-0">
+                {getStatusBadge(
+                  job.status
+                )}
+              </div>
 
             </div>
 
-            {/* ================================================================= */}
             {/* Job Information */}
-            {/* ================================================================= */}
 
             <div className="grid grid-cols-2 gap-3">
 
-              <div className="flex items-center gap-2">
+              {/* Date */}
 
-                <Calendar className="w-4 h-4 text-muted-foreground" />
+              <div className="min-w-0 rounded-2xl border border-[#E2EAE7] bg-[#F7F9F8] p-3">
 
-                <div>
+                <div className="flex min-w-0 items-center gap-2.5">
 
-                  <p className="text-xs text-muted-foreground">
-                    Date
-                  </p>
+                  <div className="shrink-0 rounded-xl bg-primary/10 p-2 ring-1 ring-primary/10">
 
-                  <p className="font-medium text-sm">
-                    {new Date(
-                      job.date
-                    ).toLocaleDateString()}
-                  </p>
+                    <Calendar
+                      className="h-3.5 w-3.5 text-primary"
+                      strokeWidth={2.25}
+                    />
 
-                </div>
+                  </div>
 
-              </div>
+                  <div className="min-w-0">
 
-              <div className="flex items-center gap-2">
+                    <p className="mb-0.5 text-[11px] font-medium text-muted-foreground">
+                      Date
+                    </p>
 
-                <Clock className="w-4 h-4 text-muted-foreground" />
+                    <p className="whitespace-nowrap text-sm font-semibold text-[#1F372E]">
+                      {new Date(
+                        job.date
+                      ).toLocaleDateString(
+                        "en-GB"
+                      )}
+                    </p>
 
-                <div>
-
-                  <p className="text-xs text-muted-foreground">
-                    Duration
-                  </p>
-
-                  <p className="font-medium text-sm">
-                    {job.duration}{" "}
-                    {job.duration ===
-                    1
-                      ? "day"
-                      : "days"}
-                  </p>
+                  </div>
 
                 </div>
 
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* Workers */}
 
-                <Users className="w-4 h-4 text-muted-foreground" />
+              <div className="min-w-0 rounded-2xl border border-[#E2EAE7] bg-[#F7F9F8] p-3">
 
-                <div>
+                <div className="flex min-w-0 items-center gap-2.5">
 
-                  <p className="text-xs text-muted-foreground">
-                    Workers
-                  </p>
+                  <div className="shrink-0 rounded-xl bg-primary/10 p-2 ring-1 ring-primary/10">
 
-                  <p className="font-medium text-sm">
-                    {
-                      job.associatesNeeded
-                    }{" "}
-                    needed
-                  </p>
+                    <Users
+                      className="h-3.5 w-3.5 text-primary"
+                      strokeWidth={2.25}
+                    />
+
+                  </div>
+
+                  <div className="min-w-0">
+
+                    <p className="mb-0.5 text-[11px] font-medium text-muted-foreground">
+                      Workers
+                    </p>
+
+                    <p className="whitespace-nowrap text-sm font-semibold text-[#1F372E]">
+                      {job.associatesNeeded}
+                    </p>
+
+                  </div>
 
                 </div>
 
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* Budget */}
 
-                <DollarSign className="w-4 h-4 text-muted-foreground" />
+              <div className="min-w-0 rounded-2xl border border-[#E2EAE7] bg-[#F7F9F8] p-3">
 
-                <div>
+                <div className="flex min-w-0 items-center gap-2.5">
 
-                  <p className="text-xs text-muted-foreground">
-                    Budget
-                  </p>
+                  <div className="shrink-0 rounded-xl bg-accent/15 p-2 ring-1 ring-accent/20">
 
-                  <p className="font-medium text-sm">
-                    ₹{job.budget}
-                  </p>
+                    <DollarSign
+                      className="h-3.5 w-3.5 text-accent-foreground"
+                      strokeWidth={2.25}
+                    />
+
+                  </div>
+
+                  <div className="min-w-0">
+
+                    <p className="mb-0.5 text-[11px] font-medium text-muted-foreground">
+                      Budget
+                    </p>
+
+                    <p className="whitespace-nowrap text-sm font-semibold text-[#1F372E]">
+                      ₹{job.budget}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              {/* Duration */}
+
+              <div className="min-w-0 rounded-2xl border border-[#E2EAE7] bg-[#F7F9F8] p-3">
+
+                <div className="flex min-w-0 items-center gap-2.5">
+
+                  <div className="shrink-0 rounded-xl bg-primary/10 p-2 ring-1 ring-primary/10">
+
+                    <Calendar
+                      className="h-3.5 w-3.5 text-primary"
+                      strokeWidth={2.25}
+                    />
+
+                  </div>
+
+                  <div className="min-w-0">
+
+                    <p className="mb-0.5 text-[11px] font-medium text-muted-foreground">
+                      Duration
+                    </p>
+
+                    <p className="whitespace-nowrap text-sm font-semibold text-[#1F372E]">
+                      {job.duration}{" "}
+                      {job.duration === 1
+                        ? "day"
+                        : "days"}
+                    </p>
+
+                  </div>
 
                 </div>
 
@@ -848,283 +969,304 @@ useEffect(() => {
 
             </div>
 
-            {/* ================================================================= */}
+            {/* =============================================================== */}
             {/* Interested Associates */}
-            {/* ================================================================= */}
+            {/* =============================================================== */}
 
-            {user?.userType ===
-              "farmer" &&
-              interestedCount >
-                0 && (
+            {user?.userType === "farmer" &&
+              interestedCount > 0 && (
 
-                <div className="mt-4 pt-4 border-t">
+                <div className="mt-6 border-t border-[#E2EAE7] pt-5">
 
-                  {/* ----------------------------------------------------------- */}
-                  {/* Interested Header */}
-                  {/* ----------------------------------------------------------- */}
+                  <div className="mb-4 flex items-center justify-between gap-3">
 
-                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex min-w-0 items-center gap-2.5">
 
-                    <div className="flex items-center gap-2">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10">
 
-                      <Users className="w-4 h-4 text-primary" />
+                        <Users className="h-4 w-4 text-primary" />
 
-                      <span className="font-semibold text-sm">
-                        Interested Associates
-                      </span>
+                      </div>
+
+                      <div className="min-w-0">
+
+                        <h2 className="truncate font-display text-base font-semibold text-[#1F372E]">
+                          People Interested
+                        </h2>
+
+                        
+
+                      </div>
 
                     </div>
 
                     <Badge
-                      variant="default"
-                      className="font-semibold"
+                      variant="outline"
+                      className="shrink-0 rounded-full border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary"
                       data-testid="badge-interested-count"
                     >
                       {interestedCount}{" "}
-                      {interestedCount ===
-                      1
+                      {interestedCount === 1
                         ? "person"
                         : "people"}
                     </Badge>
 
                   </div>
 
-                  {/* ----------------------------------------------------------- */}
-                  {/* Associate List */}
-                  {/* ----------------------------------------------------------- */}
-
                   <div className="space-y-3">
 
                     {interests
                       .filter(
-                        (
-                          interest
-                        ) =>
-                          interest.status
-                            .toLowerCase() ===
-                            "interested" ||
-                          interest.status
-                            .toLowerCase() ===
-                            "shortlisted"
-                      )
-                      .map(
-                        (
-                          interest
-                        ) => {
-
-                          const associate =
-                            interest.associate;
-
-                          const isShortlisted =
-                            interest.status
-                              .toLowerCase() ===
-                            "shortlisted";
+                        (interest) => {
+                          const status =
+                            interest.status?.toLowerCase();
 
                           return (
-                            <Card
-                              key={
-                                associate.id
-                              }
-                            >
-
-                              <CardContent className="p-4">
-
-                                <div className="flex items-start justify-between gap-3">
-
-                                  {/* ================================================= */}
-                                  {/* Associate Information */}
-                                  {/* ================================================= */}
-
-                                  <div className="flex-1">
-
-                                    <h4 className="font-semibold">
-                                      {
-                                        associate.name ||
-                                        "Associate"
-                                      }
-                                    </h4>
-
-                                    <p className="text-sm text-muted-foreground mt-1">
-
-                                      {associate
-                                        .skills
-                                        ?.length
-                                        ? associate.skills.join(
-                                            ", "
-                                          )
-                                        : "No skills listed"}
-
-                                    </p>
-
-                                    <div className="flex items-center gap-1 mt-1">
-
-                                      <Star className="w-4 h-4 fill-primary text-primary" />
-
-                                      <span className="font-medium text-sm">
-
-                                        {Number(
-                                          associate.averageRating ??
-                                            0
-                                        ).toFixed(
-                                          1
-                                        )}
-
-                                      </span>
-
-                                      <span className="text-xs text-muted-foreground">
-
-                                        (
-                                        {
-                                          associate.jobsCompleted ??
-                                          0
-                                        }{" "}
-                                        jobs)
-
-                                      </span>
-
-                                    </div>
-
-                                  </div>
-
-                                  {/* ================================================= */}
-                                  {/* Status and Action */}
-                                  {/* ================================================= */}
-
-                                  <div className="flex flex-col items-end gap-2">
-
-                                    {/* ----------------------------------------- */}
-                                    {/* Interested Badge */}
-                                    {/* ----------------------------------------- */}
-
-                                    {!isShortlisted && (
-                                      <Badge
-                                        className="bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-50"
-                                        data-testid={`badge-interested-${associate.id}`}
-                                      >
-                                        Interested
-                                      </Badge>
-                                    )}
-
-                                    {/* ----------------------------------------- */}
-                                    {/* Shortlisted Badge */}
-                                    {/* ----------------------------------------- */}
-                                    {/*
-                                      IMPORTANT:
-                                      This is intentionally the exact same
-                                      Badge variant used by the Active job
-                                      status above: variant="default".
-                                    */}
-
-                                    {isShortlisted && (
-                                      <Badge
-                                        variant="default"
-                                        data-testid={`badge-shortlisted-${associate.id}`}
-                                      >
-                                        Shortlisted
-                                      </Badge>
-                                    )}
-
-                                    {/* ----------------------------------------- */}
-                                    {/* Shortlist / Remove Shortlist */}
-                                    {/* ----------------------------------------- */}
-
-                                    {job.status !==
-                                      "Completed" && (
-
-                                      <Button
-                                        size="sm"
-                                        variant={
-                                          isShortlisted
-                                            ? "outline"
-                                            : "default"
-                                        }
-                                        onClick={() =>
-                                          handleShortlist(
-                                            associate.id
-                                          )
-                                        }
-                                        disabled={
-                                          updateInterestMutation.isPending ||
-                                          (
-                                            !isShortlisted &&
-                                            shortlisted.size >=
-                                              job.associatesNeeded
-                                          )
-                                        }
-                                        data-testid={
-                                          isShortlisted
-                                            ? `button-remove-shortlist-${associate.id}`
-                                            : `button-shortlist-${associate.id}`
-                                        }
-                                      >
-
-                                        {isShortlisted ? (
-                                          <>
-                                            <X className="w-4 h-4 mr-1" />
-                                            Remove shortlist
-                                          </>
-                                        ) : (
-                                          <>
-                                            <Check className="w-4 h-4 mr-1" />
-                                            Shortlist
-                                          </>
-                                        )}
-
-                                      </Button>
-
-                                    )}
-
-                                  </div>
-
-                                </div>
-
-                              </CardContent>
-
-                            </Card>
+                            status ===
+                              "interested" ||
+                            status ===
+                              "shortlisted"
                           );
                         }
-                      )}
+                      )
+                      .map((interest) => {
+
+                        const associate =
+                          interest.associate;
+
+                        const isShortlisted =
+                          interest.status?.toLowerCase() ===
+                          "shortlisted";
+
+                        const rating =
+                          Number(
+                            associate.averageRating ??
+                              0
+                          );
+
+                        const jobsCompleted =
+                          Number(
+                            associate.jobsCompleted ??
+                              0
+                          );
+
+                        return (
+                          <div
+                            key={associate.id}
+                            className="
+                              rounded-2xl
+                              border border-[#E2EAE7]
+                              bg-[#F7F9F8]
+                              p-3.5
+                              transition-all
+                              duration-200
+                              hover:shadow-[0_8px_22px_rgba(31,55,46,0.07)]
+                            "
+                          >
+
+                            <div className="flex items-center justify-between gap-3">
+
+                              {/* Associate Information */}
+                              <div className="min-w-0 flex-1">
+
+                                {/* Clickable Name */}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    openAssociateRatings(
+                                      associate.id
+                                    )
+                                  }
+                                  className="
+                                    block
+                                    max-w-full
+                                    rounded-md
+                                    text-left
+                                    focus:outline-none
+                                    focus:ring-2
+                                    focus:ring-primary/30
+                                    focus:ring-offset-2
+                                  "
+                                  data-testid={`button-associate-name-${associate.id}`}
+                                >
+                                  <h3
+                                    className="
+                                      truncate
+                                      font-display
+                                      text-base
+                                      font-semibold
+                                      text-[#1F372E]
+                                      transition-colors
+                                      hover:text-primary
+                                    "
+                                  >
+                                    {associate.name ||
+                                      "Associate"}
+                                  </h3>
+                                </button>
+
+                                {/* Clickable Rating */}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    openAssociateRatings(
+                                      associate.id
+                                    )
+                                  }
+                                  className="
+                                    mt-1.5
+                                    flex
+                                    items-center
+                                    gap-1.5
+                                    rounded-md
+                                    text-left
+                                    transition-opacity
+                                    hover:opacity-80
+                                    focus:outline-none
+                                    focus:ring-2
+                                    focus:ring-primary/30
+                                    focus:ring-offset-2
+                                  "
+                                  data-testid={`button-associate-rating-${associate.id}`}
+                                  aria-label={`View ratings for ${
+                                    associate.name ||
+                                    "Associate"
+                                  }`}
+                                >
+                                  <Star
+                                    className="
+                                      h-4
+                                      w-4
+                                      shrink-0
+                                      fill-primary
+                                      text-primary
+                                    "
+                                    strokeWidth={2}
+                                  />
+
+                                  <span className="text-sm font-semibold text-[#1F372E]">
+                                    {rating.toFixed(
+                                      1
+                                    )}
+                                  </span>
+
+                                  <span className="text-xs text-[#71827B]">
+                                    (
+                                    {
+                                      jobsCompleted
+                                    }{" "}
+                                    {jobsCompleted ===
+                                    1
+                                      ? "job"
+                                      : "jobs"}
+                                    )
+                                  </span>
+                                </button>
+
+                              </div>
+
+                              {/* Shortlist / Remove */}
+                              {job.status !==
+                                "Completed" && (
+
+                                <Button
+                                  size="sm"
+                                  variant={
+                                    isShortlisted
+                                      ? "outline"
+                                      : "default"
+                                  }
+                                  onClick={() =>
+                                    handleShortlist(
+                                      associate.id
+                                    )
+                                  }
+                                  disabled={
+                                    updateInterestMutation.isPending ||
+                                    (
+                                      !isShortlisted &&
+                                      shortlisted.size >=
+                                        job.associatesNeeded
+                                    )
+                                  }
+                                  className={
+                                    isShortlisted
+                                      ? `
+                                        h-9
+                                        shrink-0
+                                        rounded-lg
+                                        border-[#DCE7E3]
+                                        bg-white
+                                        px-3
+                                        text-xs
+                                        font-semibold
+                                      `
+                                      : `
+                                        h-9
+                                        shrink-0
+                                        rounded-lg
+                                        px-3
+                                        text-xs
+                                        font-semibold
+                                      `
+                                  }
+                                  data-testid={
+                                    isShortlisted
+                                      ? `button-remove-shortlist-${associate.id}`
+                                      : `button-shortlist-${associate.id}`
+                                  }
+                                >
+                                  {isShortlisted ? (
+                                    <>
+                                      <X className="mr-1 h-3.5 w-3.5" />
+                                      Remove
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Check className="mr-1 h-3.5 w-3.5" />
+                                      Shortlist
+                                    </>
+                                  )}
+                                </Button>
+
+                              )}
+
+                            </div>
+
+                          </div>
+                        );
+                      })}
 
                   </div>
 
                 </div>
               )}
 
-            {/* ================================================================= */}
+            {/* =============================================================== */}
             {/* Farmer Actions */}
-            {/* ================================================================= */}
+            {/* =============================================================== */}
 
-            {user?.userType ===
-              "farmer" &&
+            {user?.userType === "farmer" &&
               (
-                job.status ===
-                  "Open" ||
-                job.status ===
-                  "Assigned"
+                job.status === "Open" ||
+                job.status === "Assigned"
               ) && (
 
-                <div className="space-y-3 mt-6 pt-4 border-t">
+                <div className="mt-6 border-t border-[#E2EAE7] pt-5">
 
-                  {/* ----------------------------------------------------------- */}
-                  {/* Edit / Cancel */}
-                  {/* ----------------------------------------------------------- */}
+                  {job.status === "Open" && (
 
-                  {job.status ===
-                    "Open" && (
-
-                    <div className="flex gap-2">
+                    <div className="mb-2.5 grid grid-cols-2 gap-2.5">
 
                       <Button
                         onClick={() =>
-                          setIsEditing(
-                            true
-                          )
+                          setIsEditing(true)
                         }
                         variant="outline"
-                        className="flex-1"
+                        className="h-10 rounded-xl border-[#DCE7E3] bg-[#F7F9F8] px-3 text-sm font-semibold text-[#1F372E] hover:bg-[#EAF1EE] hover:text-[#1F372E]"
                         data-testid="button-edit-job"
                       >
-                        <Edit className="w-4 h-4 mr-2" />
+                        <Edit className="mr-1.5 h-4 w-4" />
                         Edit
                       </Button>
 
@@ -1133,34 +1275,31 @@ useEffect(() => {
                           handleCancelJob
                         }
                         variant="outline"
-                        className="flex-1"
+                        className="h-10 rounded-xl border-[#DCE7E3] bg-[#F7F9F8] px-3 text-sm font-semibold text-[#1F372E] hover:border-red-200 hover:bg-red-50 hover:text-red-700"
                         disabled={
                           updateJobMutation.isPending
                         }
                         data-testid="button-cancel-job"
                       >
-                        <X className="w-4 h-4 mr-2" />
+                        <X className="mr-1.5 h-4 w-4" />
                         Cancel
                       </Button>
 
                     </div>
-                  )}
 
-                  {/* ----------------------------------------------------------- */}
-                  {/* Complete */}
-                  {/* ----------------------------------------------------------- */}
+                  )}
 
                   <Button
                     onClick={
                       handleMarkCompleted
                     }
-                    className="w-full"
+                    className="h-11 w-full rounded-xl px-4 text-sm font-semibold shadow-sm"
                     disabled={
                       updateJobMutation.isPending
                     }
                     data-testid="button-mark-completed"
                   >
-                    <CheckCircle className="w-4 h-4 mr-2" />
+                    <CheckCircle className="mr-2 h-4 w-4" />
                     Mark Completed
                   </Button>
 
@@ -1171,7 +1310,7 @@ useEffect(() => {
 
         </Card>
 
-      </div>
+      </main>
 
       {/* ===================================================================== */}
       {/* Cancel Job Confirmation */}
@@ -1291,10 +1430,8 @@ useEffect(() => {
       {/* Rating Dialog */}
       {/* ===================================================================== */}
 
-      {user?.userType ===
-        "farmer" &&
-        shortlistedAssociates.length >
-          0 && (
+      {user?.userType === "farmer" &&
+        shortlistedAssociates.length > 0 && (
 
           <RatingDialog
             open={
@@ -1326,13 +1463,15 @@ useEffect(() => {
       {/* Bottom Navigation */}
       {/* ===================================================================== */}
 
-      <BottomNav
-        userType={
-          user?.userType as
-            | "farmer"
-            | "associate"
-        }
-      />
+      {!showRatingDialog && (
+        <BottomNav
+          userType={
+            user?.userType as
+              | "farmer"
+              | "associate"
+          }
+        />
+      )}
 
     </div>
   );

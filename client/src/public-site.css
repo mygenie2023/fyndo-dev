@@ -1,0 +1,278 @@
+/*
+ * FYNDO PUBLIC WEBSITE OVERRIDES
+ *
+ * IMPORTANT:
+ * Import this file from the TOP of client/src/index.css:
+ *
+ * @import "./public-site.css";
+ *
+ * Do NOT place the @import at the bottom of index.css.
+ */
+
+.public-site {
+  --fyndo-public-background: oklch(0.99 0.006 95);
+  --fyndo-public-foreground: oklch(0.22 0.018 180);
+  --fyndo-public-card: oklch(1 0 0);
+  --fyndo-public-primary: oklch(0.52 0.095 176);
+  --fyndo-public-primary-foreground: oklch(0.99 0.005 180);
+  --fyndo-public-primary-deep: oklch(0.3 0.052 180);
+  --fyndo-public-secondary: oklch(0.955 0.012 176);
+  --fyndo-public-muted: oklch(0.52 0.018 180);
+  --fyndo-public-accent: oklch(0.79 0.142 76);
+  --fyndo-public-accent-foreground: oklch(0.3 0.07 60);
+  --fyndo-public-accent-soft: oklch(0.96 0.045 82);
+  --fyndo-public-border: oklch(0.91 0.012 176);
+  --fyndo-public-ink: oklch(0.26 0.042 180);
+  --fyndo-public-ink-foreground: oklch(0.97 0.01 176);
+
+  --fyndo-public-shadow-card:
+    0 1px 2px oklch(0.22 0.018 180 / 0.05),
+    0 12px 28px -14px oklch(0.22 0.018 180 / 0.28);
+
+  --fyndo-public-shadow-lift:
+    0 2px 6px oklch(0.22 0.018 180 / 0.06),
+    0 26px 50px -22px oklch(0.22 0.018 180 / 0.4);
+}
+
+/* Typography */
+
+.public-site {
+  color: var(--fyndo-public-foreground);
+  background: var(--fyndo-public-background);
+  font-family:
+    "Plus Jakarta Sans",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+}
+
+.public-site h1,
+.public-site h2,
+.public-site h3,
+.public-site h4 {
+  font-family:
+    "Bricolage Grotesque",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+}
+
+/* Exact public-site semantic utilities */
+
+.public-site .bg-primary {
+  background-color: var(--fyndo-public-primary) !important;
+}
+
+.public-site .bg-accent {
+  background-color: var(--fyndo-public-accent) !important;
+}
+
+.public-site .bg-card {
+  background-color: var(--fyndo-public-card) !important;
+}
+
+.public-site .bg-secondary {
+  background-color: var(--fyndo-public-secondary) !important;
+}
+
+.public-site .text-primary {
+  color: var(--fyndo-public-primary) !important;
+}
+
+.public-site .text-primary-foreground {
+  color: var(--fyndo-public-primary-foreground) !important;
+}
+
+.public-site .text-primary-deep {
+  color: var(--fyndo-public-primary-deep) !important;
+}
+
+.public-site .text-accent {
+  color: var(--fyndo-public-accent) !important;
+}
+
+.public-site .text-accent-foreground {
+  color: var(--fyndo-public-accent-foreground) !important;
+}
+
+.public-site .text-foreground {
+  color: var(--fyndo-public-foreground) !important;
+}
+
+.public-site .text-muted-foreground {
+  color: var(--fyndo-public-muted) !important;
+}
+
+.public-site .border-border {
+  border-color: var(--fyndo-public-border) !important;
+}
+
+/* Opacity utility equivalents used by the original site */
+
+.public-site .bg-secondary\/40 {
+  background-color: color-mix(
+    in oklab,
+    var(--fyndo-public-secondary) 40%,
+    transparent
+  ) !important;
+}
+
+.public-site .bg-primary\/10 {
+  background-color: color-mix(
+    in oklab,
+    var(--fyndo-public-primary) 10%,
+    transparent
+  ) !important;
+}
+
+.public-site .bg-primary\/12 {
+  background-color: color-mix(
+    in oklab,
+    var(--fyndo-public-primary) 12%,
+    transparent
+  ) !important;
+}
+
+.public-site .bg-accent-soft\/50 {
+  background-color: color-mix(
+    in oklab,
+    var(--fyndo-public-accent-soft) 50%,
+    transparent
+  ) !important;
+}
+
+.public-site .border-accent\/40 {
+  border-color: color-mix(
+    in oklab,
+    var(--fyndo-public-accent) 40%,
+    transparent
+  ) !important;
+}
+
+/* Hero */
+
+.public-site .hero-wash {
+  background-image:
+    radial-gradient(
+      120% 90% at 12% 0%,
+      color-mix(in oklab, var(--fyndo-public-primary) 16%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      90% 80% at 95% 10%,
+      color-mix(in oklab, var(--fyndo-public-accent) 22%, transparent),
+      transparent 60%
+    );
+}
+
+/* Cards */
+
+.public-site .surface-card {
+  background-color: var(--fyndo-public-card) !important;
+  border: 1px solid var(--fyndo-public-border) !important;
+  border-radius: 1.4rem !important;
+  box-shadow: var(--fyndo-public-shadow-card) !important;
+}
+
+/* Ink sections */
+
+.public-site .ink-panel {
+  background-image: linear-gradient(
+    160deg,
+    var(--fyndo-public-primary-deep),
+    color-mix(in oklab, var(--fyndo-public-primary) 70%, black)
+  ) !important;
+  color: var(--fyndo-public-ink-foreground) !important;
+}
+
+.public-site .bg-ink-foreground {
+  background-color: var(--fyndo-public-ink-foreground) !important;
+}
+
+/* Buttons */
+
+.public-site .fyndo-public-button {
+  min-height: 2.75rem;
+  font-family:
+    "Plus Jakarta Sans",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+  white-space: nowrap;
+}
+
+.public-site .fyndo-public-button.bg-primary {
+  background-color: var(--fyndo-public-primary) !important;
+  color: var(--fyndo-public-primary-foreground) !important;
+  box-shadow:
+    0 10px 24px -12px
+    color-mix(in oklab, var(--fyndo-public-primary) 65%, transparent) !important;
+}
+
+.public-site .fyndo-public-button.bg-accent {
+  background-color: var(--fyndo-public-accent) !important;
+  color: var(--fyndo-public-accent-foreground) !important;
+  box-shadow:
+    0 10px 24px -12px
+    color-mix(in oklab, var(--fyndo-public-accent) 65%, transparent) !important;
+}
+
+.public-site .fyndo-public-button.border-border {
+  background-color: var(--fyndo-public-card) !important;
+  border-color: var(--fyndo-public-border) !important;
+  color: var(--fyndo-public-foreground) !important;
+}
+
+.public-site .fyndo-public-button:hover {
+  transform: translateY(-0.125rem);
+}
+
+.public-site .fyndo-public-button:active {
+  transform: scale(0.98);
+}
+
+/* Radius */
+
+.public-site .rounded-xl {
+  border-radius: 1.15rem;
+}
+
+.public-site .rounded-2xl {
+  border-radius: 1.4rem;
+}
+
+.public-site .rounded-3xl {
+  border-radius: 1.65rem;
+}
+
+/* Container */
+
+.public-site .container-page {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 80rem;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .public-site .container-page {
+    padding-inline: 2rem;
+  }
+
+  .public-site .hero-wash h1 {
+    font-size: 3.85rem;
+    line-height: 1.03;
+  }
+}
+
+/* Motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .public-site *,
+  .public-site *::before,
+  .public-site *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

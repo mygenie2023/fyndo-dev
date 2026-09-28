@@ -1,4 +1,4 @@
-import { Briefcase, User } from "lucide-react";
+import { Briefcase, Star, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 
@@ -6,61 +6,143 @@ interface BottomNavProps {
   userType?: "farmer" | "associate";
 }
 
-export default function BottomNav({ userType = "farmer" }: BottomNavProps) {
+export default function BottomNav({
+  userType = "farmer",
+}: BottomNavProps) {
   const { t } = useTranslation();
   const [location] = useLocation();
 
-  const navItems = [
-    { path: "/jobs", icon: Briefcase, label: t("nav.jobs") },
-    { path: "/profile", icon: User, label: "Profile" },
-  ];
+  const navItems =
+    userType === "associate"
+      ? [
+          {
+            path: "/jobs",
+            icon: Briefcase,
+            label: t("nav.jobs"),
+          },
+          {
+            path: "/ratings",
+            icon: Star,
+            label: "Ratings",
+          },
+          {
+            path: "/profile",
+            icon: User,
+            label: "Profile",
+          },
+        ]
+      : [
+          {
+            path: "/jobs",
+            icon: Briefcase,
+            label: t("nav.jobs"),
+          },
+          {
+            path: "/profile",
+            icon: User,
+            label: "Profile",
+          },
+        ];
 
   return (
-    <nav 
-      className="fixed bottom-0 left-0 right-0 px-4 pb-safe"
-      style={{ 
-        "--bottom-nav-height": "5.5rem",
-        zIndex: 10000
-      } as React.CSSProperties}
+    <nav
+      className="fixed inset-x-0 bottom-0 z-[10000]"
+      style={
+        {
+          "--bottom-nav-height": "5.5rem",
+        } as React.CSSProperties
+      }
     >
-      <div className="max-w-2xl mx-auto pb-4 pt-2">
-        <div className="bg-card/80 backdrop-blur-xl border border-card-border/60 rounded-2xl shadow-lg px-2 py-2">
-          <div className="flex items-center justify-around">
+      <div className="mx-auto w-full max-w-2xl">
+        <div
+          className="
+            border-t border-[#DDE7E3]
+            bg-white/95
+            px-3
+            pt-2
+            shadow-[0_-8px_24px_rgba(31,55,46,0.06)]
+            backdrop-blur-xl
+            pb-[calc(0.5rem+env(safe-area-inset-bottom))]
+          "
+        >
+          <div
+            className={`grid ${
+              userType === "associate"
+                ? "grid-cols-3"
+                : "grid-cols-2"
+            } gap-2`}
+          >
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location === item.path;
-              
+
+              const isActive =
+                item.path === "/jobs"
+                  ? location === "/jobs"
+                  : location === item.path;
+
               return (
                 <Link
                   key={item.path}
                   href={item.path}
-                  data-testid={`nav-${item.label.toLowerCase()}`}
+                  className="
+                    relative flex
+                    min-h-[3.75rem]
+                    items-center
+                    justify-center
+                    rounded-xl
+                    transition-all
+                    duration-200
+                  "
+                  data-testid={`nav-${item.path.replace("/", "")}`}
                 >
-                  <button
+                  {isActive && (
+                    <div
+                      className="
+                        absolute
+                        inset-0
+                        rounded-xl
+                        bg-primary/10
+                        ring-1
+                        ring-primary/15
+                      "
+                    />
+                  )}
+
+                  <div
                     className={`
-                      relative flex flex-col items-center justify-center gap-1
-                      w-16 h-14 rounded-xl transition-all duration-300
-                      ${isActive 
-                        ? "text-primary" 
-                        : "text-muted-foreground hover:text-foreground"
+                      relative
+                      z-10
+                      flex
+                      flex-col
+                      items-center
+                      justify-center
+                      gap-1
+                      ${
+                        isActive
+                          ? "text-primary"
+                          : "text-muted-foreground"
                       }
                     `}
                   >
-                    {isActive && (
-                      <div className="absolute inset-0 bg-primary/10 rounded-xl ring-1 ring-primary/20 transition-all duration-300" />
-                    )}
-                    <Icon 
-                      className={`relative w-5 h-5 transition-all duration-300 ${
-                        isActive ? "scale-110" : "scale-100"
-                      }`}
-                      strokeWidth={isActive ? 2.5 : 2}
+                    <Icon
+                      className="h-5 w-5"
+                      strokeWidth={isActive ? 2.4 : 2}
                     />
-                    <span className={`relative text-[10px] font-semibold tracking-tight transition-all duration-300 ${
-                      isActive ? "opacity-100" : "opacity-70"
-                    }`}>
+
+                    <span
+                      className={`
+                        text-[11px]
+                        font-semibold
+                        ${
+                          isActive
+                            ? "text-primary"
+                            : "text-muted-foreground"
+                        }
+                      `}
+                    >
                       {item.label}
                     </span>
-                  </button>
+                  </div>
                 </Link>
               );
             })}

@@ -60,7 +60,6 @@ export default function Notifications() {
           <div className="flex items-center gap-3">
             <img src={fyndoLogo} alt="FYNDO" className="h-8" data-testid="img-logo" />
           </div>
-          <LanguageSwitcher />
         </div>
       </header>
 

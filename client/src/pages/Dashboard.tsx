@@ -181,7 +181,6 @@ export default function Dashboard() {
           <p className="text-xs text-muted-foreground">{t("dashboard.welcome")}</p>
         </div>
         <div className="flex items-center gap-2">
-          <LanguageSwitcher />
           <Button size="icon" variant="ghost" className="relative" data-testid="button-notifications">
             <Bell className="w-5 h-5" strokeWidth={2} />
             <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full ring-2 ring-card" />

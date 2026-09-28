@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+﻿import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
@@ -11,6 +11,11 @@ export default {
         sm: ".1875rem", /* 3px */
       },
       colors: {
+        "primary-soft": "hsl(var(--primary-soft) / <alpha-value>)",
+        "primary-deep": "hsl(var(--primary-deep) / <alpha-value>)",
+        "accent-soft": "hsl(var(--accent-soft) / <alpha-value>)",
+        ink: "hsl(var(--ink) / <alpha-value>)",
+        "ink-foreground": "hsl(var(--ink-foreground) / <alpha-value>)",
         // Flat / base colors (regular buttons)
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
@@ -83,9 +88,14 @@ export default {
         },
       },
       fontFamily: {
+        display: ["var(--font-display)"],
         sans: ["var(--font-sans)"],
         serif: ["var(--font-serif)"],
         mono: ["var(--font-mono)"],
+      },
+      boxShadow: {
+        card: "var(--shadow-card)",
+        lift: "var(--shadow-lift)",
       },
       keyframes: {
         "accordion-down": {
@@ -105,3 +115,4 @@ export default {
   },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;
+

@@ -20,9 +20,9 @@ type AdminTab = "jobs" | "users" | "services";
  * Reads the active admin tab from the URL query parameter.
  *
  * Examples:
- * /app/admin/dashboard?tab=jobs
- * /app/admin/dashboard?tab=users
- * /app/admin/dashboard?tab=services
+ * /admin/dashboard?tab=jobs
+ * /admin/dashboard?tab=users
+ * /admin/dashboard?tab=services
  *
  * Defaults to "jobs" when no valid tab is specified.
  */
@@ -56,15 +56,6 @@ export default function AdminDashboard() {
 
   /**
    * Handle browser Back / Forward navigation.
-   *
-   * Example:
-   * Users
-   *   ↓
-   * User Details
-   *   ↓
-   * Back
-   *   ↓
-   * Users tab
    */
   useEffect(() => {
     const handlePopState = () => {
@@ -81,17 +72,8 @@ export default function AdminDashboard() {
   /**
    * Change the active Admin tab.
    *
-   * IMPORTANT:
-   * We intentionally do NOT use import.meta.env.BASE_URL here.
-   *
-   * Vite is already configured with:
-   *   base: "/app/"
-   *
-   * Therefore adding BASE_URL manually can result in:
-   *   /app/app/admin/dashboard
-   *
-   * Instead, we preserve the current pathname and only update
-   * the query parameter.
+   * The current pathname is preserved and only the
+   * tab query parameter is updated.
    */
   const handleTabChange = (value: string) => {
     if (
@@ -107,20 +89,13 @@ export default function AdminDashboard() {
     // Update React state immediately.
     setActiveTab(tab);
 
-    // Preserve the existing pathname, including /app.
+    // Preserve the current pathname and update
+    // only the tab query parameter.
     const url = new URL(window.location.href);
 
-    // Update only the tab query parameter.
     url.searchParams.set("tab", tab);
 
     // Add a browser history entry.
-    //
-    // Example:
-    // /app/admin/dashboard?tab=jobs
-    // becomes
-    // /app/admin/dashboard?tab=users
-    //
-    // It will NEVER create /app/app/...
     window.history.pushState(
       { tab },
       "",
@@ -145,81 +120,203 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <div className="bg-card/80 backdrop-blur-xl border-b border-card-border/60 sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img
-              src={fyndoLogo}
-              alt="FYNDO"
-              className="h-8"
-              data-testid="img-logo"
-            />
 
-            <span className="text-sm font-medium text-muted-foreground">
-              Admin
-            </span>
+      {/* ================================================================== */}
+      {/* Admin Header */}
+      {/* ================================================================== */}
+
+      <div className="sticky top-0 z-50 border-b border-card-border/60 bg-card/90 backdrop-blur-xl">
+
+        <div className="container mx-auto px-4">
+
+          <div className="relative flex min-h-[4.5rem] items-center justify-between">
+
+            {/* ============================================================ */}
+            {/* Logo / Admin Brand */}
+            {/* ============================================================ */}
+
+            <div className="flex shrink-0 items-center gap-2">
+              <img
+                src={fyndoLogo}
+                alt="FYNDO"
+                className="h-8"
+                data-testid="img-logo"
+              />
+
+              <span className="text-sm font-medium text-muted-foreground">
+                Admin
+              </span>
+            </div>
+
+            {/* ============================================================ */}
+            {/* Center Navigation */}
+            {/* ============================================================ */}
+
+            <div className="absolute left-1/2 -translate-x-1/2 overflow-x-auto">
+
+              <Tabs
+                value={activeTab}
+                onValueChange={handleTabChange}
+              >
+
+                <TabsList className="inline-flex h-10 w-auto min-w-max gap-1 bg-transparent p-0">
+
+                  {/* Jobs */}
+
+                  <TabsTrigger
+                    value="jobs"
+                    data-testid="tab-jobs"
+                    className="
+                      rounded-xl
+                      px-4
+                      text-sm
+                      font-semibold
+                      text-muted-foreground
+                      transition-all
+                      data-[state=active]:bg-primary/10
+                      data-[state=active]:text-primary
+                      data-[state=active]:shadow-none
+                    "
+                  >
+                    Jobs
+                  </TabsTrigger>
+
+                  {/* Users */}
+
+                  <TabsTrigger
+                    value="users"
+                    data-testid="tab-users"
+                    className="
+                      rounded-xl
+                      px-4
+                      text-sm
+                      font-semibold
+                      text-muted-foreground
+                      transition-all
+                      data-[state=active]:bg-primary/10
+                      data-[state=active]:text-primary
+                      data-[state=active]:shadow-none
+                    "
+                  >
+                    Users
+                  </TabsTrigger>
+
+                  {/* Services */}
+
+                  <TabsTrigger
+                    value="services"
+                    data-testid="tab-services"
+                    className="
+                      rounded-xl
+                      px-4
+                      text-sm
+                      font-semibold
+                      text-muted-foreground
+                      transition-all
+                      data-[state=active]:bg-primary/10
+                      data-[state=active]:text-primary
+                      data-[state=active]:shadow-none
+                    "
+                  >
+                    Services
+                  </TabsTrigger>
+
+                </TabsList>
+
+              </Tabs>
+
+            </div>
+
+            {/* ============================================================ */}
+            {/* Logout */}
+            {/* ============================================================ */}
+
+            <div className="shrink-0">
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                data-testid="button-logout"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+
+            </div>
+
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleLogout}
-            data-testid="button-logout"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Button>
         </div>
+
       </div>
 
+      {/* ================================================================== */}
       {/* Dashboard Content */}
+      {/* ================================================================== */}
+
       <div className="container mx-auto px-4 py-8">
+
         <Tabs
           value={activeTab}
           onValueChange={handleTabChange}
           className="space-y-6"
         >
-          {/* Admin Navigation Tabs */}
-          <TabsList className="grid w-full max-w-2xl grid-cols-3 mx-auto">
-            <TabsTrigger
-              value="jobs"
-              data-testid="tab-jobs"
-            >
+
+          {/*
+
+            The navigation is now displayed in the header.
+
+            This hidden TabsList keeps the Radix Tabs structure
+            intact so the existing TabsContent components continue
+            to work normally.
+
+          */}
+
+          <TabsList className="hidden">
+
+            <TabsTrigger value="jobs">
               Jobs
             </TabsTrigger>
 
-            <TabsTrigger
-              value="users"
-              data-testid="tab-users"
-            >
+            <TabsTrigger value="users">
               Users
             </TabsTrigger>
 
-            <TabsTrigger
-              value="services"
-              data-testid="tab-services"
-            >
+            <TabsTrigger value="services">
               Services
             </TabsTrigger>
+
           </TabsList>
 
+          {/* ============================================================ */}
           {/* Jobs */}
+          {/* ============================================================ */}
+
           <TabsContent value="jobs">
             <AdminJobs />
           </TabsContent>
 
+          {/* ============================================================ */}
           {/* Users */}
+          {/* ============================================================ */}
+
           <TabsContent value="users">
             <AdminUsers />
           </TabsContent>
 
+          {/* ============================================================ */}
           {/* Services */}
+          {/* ============================================================ */}
+
           <TabsContent value="services">
             <AdminServices />
           </TabsContent>
+
         </Tabs>
+
       </div>
+
     </div>
   );
 }

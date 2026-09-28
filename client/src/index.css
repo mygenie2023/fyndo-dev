@@ -1,20 +1,29 @@
+﻿@import "./public-site.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE */
+
+/* =========================================================
+   FYNDO APPLICATION / ADMIN DESIGN TOKENS
+   ========================================================= */
+
 :root {
-  --button-outline: rgba(0,0,0, .10);
-  --badge-outline: rgba(0,0,0, .05);
+  --button-outline: rgba(0, 0, 0, 0.1);
+  --badge-outline: rgba(0, 0, 0, 0.05);
   --opaque-button-border-intensity: -8;
-  --elevate-1: rgba(0,0,0, .03);
-  --elevate-2: rgba(0,0,0, .08);
+  --elevate-1: rgba(0, 0, 0, 0.03);
+  --elevate-2: rgba(0, 0, 0, 0.08);
+
   --background: 170 20% 97%;
   --foreground: 170 10% 12%;
   --border: 170 12% 88%;
+
   --card: 0 0% 100%;
   --card-foreground: 170 10% 12%;
   --card-border: 170 10% 92%;
+
   --sidebar: 170 15% 96%;
   --sidebar-foreground: 170 10% 12%;
   --sidebar-border: 170 12% 90%;
@@ -23,147 +32,165 @@
   --sidebar-accent: 170 20% 88%;
   --sidebar-accent-foreground: 170 10% 20%;
   --sidebar-ring: 170 65% 38%;
+
   --popover: 0 0% 98%;
   --popover-foreground: 170 10% 12%;
   --popover-border: 170 12% 90%;
+
   --primary: 170 65% 38%;
   --primary-foreground: 0 0% 100%;
+
   --secondary: 170 12% 90%;
   --secondary-foreground: 170 10% 18%;
+
   --muted: 170 12% 94%;
   --muted-foreground: 170 8% 42%;
+
   --accent: 42 78% 55%;
   --accent-foreground: 42 90% 18%;
+
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
+
   --input: 170 12% 85%;
   --ring: 170 65% 38%;
+
   --chart-1: 170 65% 38%;
   --chart-2: 42 78% 55%;
   --chart-3: 195 70% 48%;
   --chart-4: 270 60% 58%;
   --chart-5: 25 80% 58%;
+
   --font-sans: Inter, -apple-system, system-ui, sans-serif;
   --font-serif: Georgia, serif;
-  --font-mono: 'SF Mono', Menlo, Consolas, monospace;
+  --font-mono: "SF Mono", Menlo, Consolas, monospace;
+
   --radius: 0.75rem;
-  --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.04);
-  --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.06);
-  --shadow-sm: 0px 2px 6px -1px hsl(0 0% 0% / 0.08), 0px 1px 3px -1px hsl(0 0% 0% / 0.06);
-  --shadow: 0px 4px 8px -2px hsl(0 0% 0% / 0.10), 0px 2px 4px -2px hsl(0 0% 0% / 0.06);
-  --shadow-md: 0px 6px 12px -2px hsl(0 0% 0% / 0.12), 0px 3px 6px -3px hsl(0 0% 0% / 0.08);
-  --shadow-lg: 0px 12px 24px -4px hsl(0 0% 0% / 0.15), 0px 6px 12px -6px hsl(0 0% 0% / 0.10);
-  --shadow-xl: 0px 20px 32px -6px hsl(0 0% 0% / 0.18), 0px 10px 16px -8px hsl(0 0% 0% / 0.12);
-  --shadow-2xl: 0px 32px 48px -8px hsl(0 0% 0% / 0.22);
+
+  --shadow-2xs: 0 1px 2px 0 hsl(0 0% 0% / 0.04);
+  --shadow-xs: 0 1px 3px 0 hsl(0 0% 0% / 0.06);
+
+  --shadow-sm:
+    0 2px 6px -1px hsl(0 0% 0% / 0.08),
+    0 1px 3px -1px hsl(0 0% 0% / 0.06);
+
+  --shadow:
+    0 4px 8px -2px hsl(0 0% 0% / 0.1),
+    0 2px 4px -2px hsl(0 0% 0% / 0.06);
+
+  --shadow-md:
+    0 6px 12px -2px hsl(0 0% 0% / 0.12),
+    0 3px 6px -3px hsl(0 0% 0% / 0.08);
+
+  --shadow-lg:
+    0 12px 24px -4px hsl(0 0% 0% / 0.15),
+    0 6px 12px -6px hsl(0 0% 0% / 0.1);
+
+  --shadow-xl:
+    0 20px 32px -6px hsl(0 0% 0% / 0.18),
+    0 10px 16px -8px hsl(0 0% 0% / 0.12);
+
+  --shadow-2xl:
+    0 32px 48px -8px hsl(0 0% 0% / 0.22);
+
   --tracking-normal: -0.01em;
   --spacing: 0.25rem;
 
-/* Fallback for older browsers */
   --sidebar-primary-border: hsl(var(--sidebar-primary));
-  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
   --sidebar-accent-border: hsl(var(--sidebar-accent));
-  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
   --primary-border: hsl(var(--primary));
-  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
   --secondary-border: hsl(var(--secondary));
-  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
   --muted-border: hsl(var(--muted));
-  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
   --accent-border: hsl(var(--accent));
-  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
   --destructive-border: hsl(var(--destructive));
-  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Application font */
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
 }
 
 .dark {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
+  --button-outline: rgba(255, 255, 255, 0.1);
+  --badge-outline: rgba(255, 255, 255, 0.05);
   --opaque-button-border-intensity: 9;
-  --elevate-1: rgba(255,255,255, .04);
-  --elevate-2: rgba(255,255,255, .09);
+  --elevate-1: rgba(255, 255, 255, 0.04);
+  --elevate-2: rgba(255, 255, 255, 0.09);
+
   --background: 170 8% 8%;
   --foreground: 170 5% 96%;
   --border: 170 6% 18%;
+
   --card: 170 6% 11%;
   --card-foreground: 170 5% 96%;
   --card-border: 170 6% 15%;
+
   --sidebar: 170 6% 12%;
   --sidebar-foreground: 170 5% 96%;
   --sidebar-border: 170 6% 16%;
+
   --sidebar-primary: 170 60% 44%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 170 8% 18%;
   --sidebar-accent-foreground: 170 5% 90%;
   --sidebar-ring: 170 60% 44%;
+
   --popover: 170 6% 14%;
   --popover-foreground: 170 5% 96%;
   --popover-border: 170 6% 18%;
+
   --primary: 170 60% 44%;
   --primary-foreground: 0 0% 100%;
+
   --secondary: 170 6% 20%;
   --secondary-foreground: 170 5% 90%;
+
   --muted: 170 6% 20%;
   --muted-foreground: 170 5% 65%;
+
   --accent: 42 70% 50%;
   --accent-foreground: 42 90% 95%;
+
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
+
   --input: 170 6% 28%;
   --ring: 170 60% 44%;
+
   --chart-1: 170 60% 52%;
   --chart-2: 42 78% 60%;
   --chart-3: 195 70% 58%;
   --chart-4: 270 60% 68%;
   --chart-5: 25 80% 65%;
-  --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.30);
-  --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.36);
-  --shadow-sm: 0px 2px 6px -1px hsl(0 0% 0% / 0.40), 0px 1px 3px -1px hsl(0 0% 0% / 0.30);
-  --shadow: 0px 4px 8px -2px hsl(0 0% 0% / 0.45), 0px 2px 4px -2px hsl(0 0% 0% / 0.35);
-  --shadow-md: 0px 6px 12px -2px hsl(0 0% 0% / 0.50), 0px 3px 6px -3px hsl(0 0% 0% / 0.40);
-  --shadow-lg: 0px 12px 24px -4px hsl(0 0% 0% / 0.55), 0px 6px 12px -6px hsl(0 0% 0% / 0.45);
-  --shadow-xl: 0px 20px 32px -6px hsl(0 0% 0% / 0.60), 0px 10px 16px -8px hsl(0 0% 0% / 0.50);
-  --shadow-2xl: 0px 32px 48px -8px hsl(0 0% 0% / 0.70);
 
-/* Fallback for older browsers */
-  --sidebar-primary-border: hsl(var(--sidebar-primary));
-  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --shadow-2xs: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+  --shadow-xs: 0 1px 3px 0 hsl(0 0% 0% / 0.36);
 
-  /* Fallback for older browsers */
-  --sidebar-accent-border: hsl(var(--sidebar-accent));
-  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --shadow-sm:
+    0 2px 6px -1px hsl(0 0% 0% / 0.4),
+    0 1px 3px -1px hsl(0 0% 0% / 0.3);
 
-  /* Fallback for older browsers */
-  --primary-border: hsl(var(--primary));
-  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --shadow:
+    0 4px 8px -2px hsl(0 0% 0% / 0.45),
+    0 2px 4px -2px hsl(0 0% 0% / 0.35);
 
-  /* Fallback for older browsers */
-  --secondary-border: hsl(var(--secondary));
-  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --shadow-md:
+    0 6px 12px -2px hsl(0 0% 0% / 0.5),
+    0 3px 6px -3px hsl(0 0% 0% / 0.4);
 
-  /* Fallback for older browsers */
-  --muted-border: hsl(var(--muted));
-  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --shadow-lg:
+    0 12px 24px -4px hsl(0 0% 0% / 0.55),
+    0 6px 12px -6px hsl(0 0% 0% / 0.45);
 
-  /* Fallback for older browsers */
-  --accent-border: hsl(var(--accent));
-  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --shadow-xl:
+    0 20px 32px -6px hsl(0 0% 0% / 0.6),
+    0 10px 16px -8px hsl(0 0% 0% / 0.5);
 
-  /* Fallback for older browsers */
-  --destructive-border: hsl(var(--destructive));
-  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --shadow-2xl:
+    0 32px 48px -8px hsl(0 0% 0% / 0.7);
 }
+
+/* =========================================================
+   APPLICATION BASE
+   ========================================================= */
 
 @layer base {
   * {
@@ -175,76 +202,43 @@
   }
 }
 
-/**
- * Using the elevate system.
- * Automatic contrast adjustment.
- *
- * <element className="hover-elevate" />
- * <element className="active-elevate-2" />
- *
- * // Using the tailwind utility when a data attribute is "on"
- * <element className="toggle-elevate data-[state=on]:toggle-elevated" />
- * // Or manually controlling the toggle state
- * <element className="toggle-elevate toggle-elevated" />
- *
- * Elevation systems have to handle many states.
- * - not-hovered, vs. hovered vs. active  (three mutually exclusive states)
- * - toggled or not
- * - focused or not (this is not handled with these utilities)
- *
- * Even without handling focused or not, this is six possible combinations that
- * need to be distinguished from eachother visually.
- */
-@layer utilities {
+/* =========================================================
+   APPLICATION UTILITIES
+   ========================================================= */
 
-  /* Hide ugly search cancel button in Chrome until we can style it properly */
+@layer utilities {
   input[type="search"]::-webkit-search-cancel-button {
     @apply hidden;
   }
 
-  /* Placeholder styling for contentEditable div */
   [contenteditable][data-placeholder]:empty::before {
     content: attr(data-placeholder);
     color: hsl(var(--muted-foreground));
     pointer-events: none;
   }
 
-  /* .no-default-hover-elevate/no-default-active-elevate is an escape hatch so consumers of
-   * buttons/badges can remove the automatic brightness adjustment on interactions
-   * and program their own. */
   .no-default-hover-elevate {}
 
   .no-default-active-elevate {}
 
-
-  /**
-   * Toggleable backgrounds go behind the content. Hoverable/active goes on top.
-   * This way they can stack/compound. Both will overlap the parent's borders!
-   * So borders will be automatically adjusted both on toggle, and hover/active,
-   * and they will be compounded.
-   */
   .toggle-elevate::before,
   .toggle-elevate-2::before {
     content: "";
     pointer-events: none;
     position: absolute;
-    inset: 0px;
-    /*border-radius: inherit;   match rounded corners */
+    inset: 0;
     border-radius: inherit;
     z-index: -1;
-    /* sits behind content but above backdrop */
   }
 
   .toggle-elevate.toggle-elevated::before {
     background-color: var(--elevate-2);
   }
 
-  /* If there's a 1px border, adjust the inset so that it covers that parent's border */
   .border.toggle-elevate::before {
     inset: -1px;
   }
 
-  /* Does not work on elements with overflow:hidden! */
   .hover-elevate:not(.no-default-hover-elevate),
   .active-elevate:not(.no-default-active-elevate),
   .hover-elevate-2:not(.no-default-hover-elevate),
@@ -260,11 +254,9 @@
     content: "";
     pointer-events: none;
     position: absolute;
-    inset: 0px;
-    /*border-radius: inherit;   match rounded corners */
+    inset: 0;
     border-radius: inherit;
     z-index: 999;
-    /* sits in front of content */
   }
 
   .hover-elevate:hover:not(.no-default-hover-elevate)::after,
@@ -277,12 +269,366 @@
     background-color: var(--elevate-2);
   }
 
-  /* If there's a 1px border, adjust the inset so that it covers that parent's border */
   .border.hover-elevate:not(.no-hover-interaction-elevate)::after,
   .border.active-elevate:not(.no-active-interaction-elevate)::after,
   .border.hover-elevate-2:not(.no-hover-interaction-elevate)::after,
-  .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
-  .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
+  .border.active-elevate-2:not(.no-active-interaction-elevate)::after {
     inset: -1px;
   }
 }
+
+/* =========================================================
+   FYNDO PUBLIC WEBSITE DESIGN SYSTEM
+   Based on original fyndoin-website styles.css
+   Scoped to .public-site
+   ========================================================= */
+
+.public-site {
+  /*
+   * Original public website:
+   *
+   * background: oklch(0.99 0.006 95)
+   * foreground: oklch(0.22 0.018 180)
+   *
+   * HSL-compatible equivalents are used because the integrated
+   * application uses Tailwind v3 hsl(var(...)) utilities.
+   */
+
+  --background: 48 57% 98%;
+  --foreground: 167 26% 9%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 167 26% 9%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 167 26% 9%;
+
+  --primary: 170 85% 26%;
+  --primary-foreground: 165 52% 98%;
+
+  --primary-soft: 162 50% 92%;
+  --primary-deep: 171 87% 11%;
+
+  --secondary: 162 30% 93%;
+  --secondary-foreground: 168 29% 16%;
+
+  --muted: 78 23% 94%;
+  --muted-foreground: 166 7% 40%;
+
+  --accent: 37 84% 59%;
+  --accent-foreground: 30 99% 14%;
+  --accent-soft: 40 100% 91%;
+
+  --destructive: 0 71% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 162 16% 87%;
+  --input: 162 15% 86%;
+  --ring: 170 85% 26%;
+
+  --ink: 170 75% 10%;
+  --ink-foreground: 162 37% 95%;
+
+  /*
+   * CRITICAL:
+   * These variables must be local to .public-site.
+   * This makes font-sans/font-display utilities resolve to
+   * the public website fonts without affecting the app.
+   */
+  --font-sans:
+    "Plus Jakarta Sans",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+
+  --font-display:
+    "Bricolage Grotesque",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+
+  --radius: 0.9rem;
+
+  --shadow-card:
+    0 1px 2px oklch(0.22 0.018 180 / 0.05),
+    0 12px 28px -14px oklch(0.22 0.018 180 / 0.28);
+
+  --shadow-lift:
+    0 2px 6px oklch(0.22 0.018 180 / 0.06),
+    0 26px 50px -22px oklch(0.22 0.018 180 / 0.4);
+
+  --gradient-hero:
+    radial-gradient(
+      120% 90% at 12% 0%,
+      color-mix(in oklab, oklch(0.52 0.095 176) 16%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      90% 80% at 95% 10%,
+      color-mix(in oklab, oklch(0.79 0.142 76) 22%, transparent),
+      transparent 60%
+    );
+
+  --gradient-ink:
+    linear-gradient(
+      160deg,
+      oklch(0.3 0.052 180),
+      color-mix(in oklab, oklch(0.52 0.095 176) 70%, black)
+    );
+
+  background-color: oklch(0.99 0.006 95);
+  color: oklch(0.22 0.018 180);
+
+  font-family:
+    "Plus Jakarta Sans",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------
+   Public website heading typography
+   --------------------------------------------------------- */
+
+.public-site h1,
+.public-site h2,
+.public-site h3,
+.public-site h4 {
+  font-family:
+    "Bricolage Grotesque",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/*
+ * Tailwind's font-display utility uses --font-display.
+ * Keep the same behavior as the original site.
+ */
+.public-site .font-display {
+  font-family:
+    "Bricolage Grotesque",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+}
+
+/* ---------------------------------------------------------
+   Original Tailwind v4 radius scale
+   Recreated for the integrated Tailwind v3 build.
+   --------------------------------------------------------- */
+
+.public-site .rounded-sm {
+  border-radius: 0.5rem;
+}
+
+.public-site .rounded-md {
+  border-radius: 0.7rem;
+}
+
+.public-site .rounded-lg {
+  border-radius: 0.9rem;
+}
+
+.public-site .rounded-xl {
+  border-radius: 1.15rem;
+}
+
+.public-site .rounded-2xl {
+  border-radius: 1.4rem;
+}
+
+.public-site .rounded-3xl {
+  border-radius: 1.65rem;
+}
+
+.public-site .rounded-4xl {
+  border-radius: 1.9rem;
+}
+
+/* ---------------------------------------------------------
+   Public website surface card
+   Original:
+   border-radius: var(--radius-2xl)
+   shadow: var(--shadow-card)
+   --------------------------------------------------------- */
+
+.public-site .surface-card {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 1.4rem;
+  box-shadow: var(--shadow-card);
+}
+
+/* =========================================================
+   FYNDO Public Website
+   Operator card background — exact accent-soft treatment
+   ========================================================= */
+
+.public-site .surface-card.bg-accent-soft\/50 {
+  background-color: oklch(0.96 0.045 82 / 0.5) !important;
+}
+/* ---------------------------------------------------------
+   Hero background
+   --------------------------------------------------------- */
+
+.public-site .hero-wash {
+  background-image: var(--gradient-hero);
+}
+
+/* ---------------------------------------------------------
+   Dark / ink panels
+   --------------------------------------------------------- */
+
+.public-site .ink-panel {
+  background-image: var(--gradient-ink);
+  color: hsl(var(--ink-foreground));
+}
+
+/* ---------------------------------------------------------
+   Reveal animations
+   --------------------------------------------------------- */
+
+.public-site .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.public-site .reveal[data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------------------------------------------------------
+   Public animations
+   --------------------------------------------------------- */
+
+.public-site .pin-pulse {
+  animation: fyndo-pulse 2.6s ease-out infinite;
+}
+
+.public-site .float-slow {
+  animation: fyndo-float 7s ease-in-out infinite;
+}
+
+.public-site .sheet-in {
+  animation: fyndo-sheet-up 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fyndo-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.55;
+  }
+
+  70% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fyndo-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fyndo-sheet-up {
+  from {
+    transform: translateY(110%);
+    opacity: 0;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------
+   Public container
+   --------------------------------------------------------- */
+
+.public-site .container-page {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 80rem;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .public-site .container-page {
+    padding-inline: 2rem;
+  }
+}
+
+/* ---------------------------------------------------------
+   Public website responsive typography
+   --------------------------------------------------------- */
+
+.public-site h1 {
+  line-height: 1.03;
+}
+
+/*
+ * The original public site uses a slightly tighter display
+ * composition than the integrated Tailwind v3 rendering.
+ *
+ * This affects ONLY the large homepage hero heading.
+ */
+@media (min-width: 1024px) {
+  .public-site .hero-wash h1 {
+    font-size: 3.85rem;
+    line-height: 1.03;
+  }
+}
+
+/* ---------------------------------------------------------
+   Public button appearance
+   --------------------------------------------------------- */
+
+.public-site a[class*="rounded-full"],
+.public-site button[class*="rounded-full"] {
+  font-family:
+    "Plus Jakarta Sans",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+}
+
+/* ---------------------------------------------------------
+   Reduced motion
+   --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .public-site .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .public-site .pin-pulse,
+  .public-site .float-slow,
+  .public-site .sheet-in {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+

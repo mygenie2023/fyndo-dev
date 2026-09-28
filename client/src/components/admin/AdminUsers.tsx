@@ -2257,8 +2257,7 @@ export default function AdminUsers() {
                     ) : editAadharFrontUrl ? (
                       <>
                         <Check className="w-4 h-4 mr-2" />
-                        Front Side Uploaded
-                        (Click to Replace)
+                        Uploaded (Click to Replace)
                       </>
                     ) : (
                       <>
@@ -2317,8 +2316,7 @@ export default function AdminUsers() {
                     ) : editAadharBackUrl ? (
                       <>
                         <Check className="w-4 h-4 mr-2" />
-                        Back Side Uploaded
-                        (Click to Replace)
+                        Uploaded (Click to Replace)
                       </>
                     ) : (
                       <>

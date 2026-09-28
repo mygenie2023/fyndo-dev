@@ -60,10 +60,7 @@ export default function AdminJobs() {
     queryKey: ["admin", "jobs"],
 
     queryFn: async () => {
-      const {
-        data,
-        error,
-      } = await supabase.rpc(
+      const { data, error } = await supabase.rpc(
         "admin_get_all_jobs",
       );
 
@@ -71,93 +68,47 @@ export default function AdminJobs() {
         throw error;
       }
 
-      const results =
-        (data ?? []) as AdminJobResult[];
+      const results = (data ?? []) as AdminJobResult[];
 
       return results.map((item) => {
-        const job =
-          item.job || {};
-
-        const farmer =
-          item.farmer || null;
+        const job = item.job || {};
+        const farmer = item.farmer || null;
 
         return {
           ...job,
 
           // Job field mappings
-          farmerId:
-            job.farmer_id,
-
-          serviceType:
-            job.service_type,
-
-          associatesNeeded:
-            job.associates_needed,
-
-          skillLevel:
-            job.skill_level,
-
-          paymentMethod:
-            job.payment_method,
-
-          jobComment:
-            job.job_comment,
-
-          createdAt:
-            job.created_at,
+          farmerId: job.farmer_id,
+          serviceType: job.service_type,
+          associatesNeeded: job.associates_needed,
+          skillLevel: job.skill_level,
+          paymentMethod: job.payment_method,
+          jobComment: job.job_comment,
+          createdAt: job.created_at,
 
           // Farmer mapping
           farmer: farmer
             ? {
                 ...farmer,
 
-                phoneNumber:
-                  farmer.phone_number,
-
-                userType:
-                  farmer.user_type,
-
-                dateOfBirth:
-                  farmer.date_of_birth,
-
-                skillLevel:
-                  farmer.skill_level,
-
-                hourlyRate:
-                  farmer.hourly_rate,
-
+                phoneNumber: farmer.phone_number,
+                userType: farmer.user_type,
+                dateOfBirth: farmer.date_of_birth,
+                skillLevel: farmer.skill_level,
+                hourlyRate: farmer.hourly_rate,
                 expectedDailySalary:
                   farmer.expected_daily_salary,
-
-                travelDistance:
-                  farmer.travel_distance,
-
+                travelDistance: farmer.travel_distance,
                 comfortableStaying:
                   farmer.comfortable_staying,
-
-                aadharFrontUrl:
-                  farmer.aadhar_front_url,
-
-                aadharBackUrl:
-                  farmer.aadhar_back_url,
-
-                averageRating:
-                  farmer.average_rating,
-
-                totalRatings:
-                  farmer.total_ratings,
-
-                jobsCompleted:
-                  farmer.jobs_completed,
-
-                totalEarnings:
-                  farmer.total_earnings,
-
-                pendingPayments:
-                  farmer.pending_payments,
-
-                createdAt:
-                  farmer.created_at,
+                aadharFrontUrl: farmer.aadhar_front_url,
+                aadharBackUrl: farmer.aadhar_back_url,
+                averageRating: farmer.average_rating,
+                totalRatings: farmer.total_ratings,
+                jobsCompleted: farmer.jobs_completed,
+                totalEarnings: farmer.total_earnings,
+                pendingPayments: farmer.pending_payments,
+                createdAt: farmer.created_at,
               }
             : null,
         } as Job & {
@@ -170,30 +121,20 @@ export default function AdminJobs() {
   /*
    * Fetch all job interests to calculate interested count
    */
-  const {
-    data: allInterests = [],
-  } =
+  const { data: allInterests = [] } =
     useQuery<AdminInterestResult[]>({
-      queryKey: [
-        "admin",
-        "all-interests",
-      ],
+      queryKey: ["admin", "all-interests"],
 
       queryFn: async () => {
-        const {
-          data,
-          error,
-        } =
-          await supabase.rpc(
-            "admin_get_all_interests",
-          );
+        const { data, error } = await supabase.rpc(
+          "admin_get_all_interests",
+        );
 
         if (error) {
           throw error;
         }
 
-        return (data ??
-          []) as AdminInterestResult[];
+        return (data ?? []) as AdminInterestResult[];
       },
     });
 
@@ -201,194 +142,158 @@ export default function AdminJobs() {
    * Create map:
    * job ID -> number of interested/shortlisted associates
    */
-  const interestCountMap =
-    useMemo(() => {
-      const map =
-        new Map<string, number>();
+  const interestCountMap = useMemo(() => {
+    const map = new Map<string, number>();
 
-      allInterests.forEach(
-        (interest) => {
-          const jobId =
-            interest.job_id;
+    allInterests.forEach((interest) => {
+      const jobId = interest.job_id;
 
-          if (!jobId) {
-            return;
-          }
+      if (!jobId) {
+        return;
+      }
 
-          const count =
-            map.get(jobId) || 0;
+      const count = map.get(jobId) || 0;
 
-          map.set(
-            jobId,
-            count + 1,
-          );
-        },
-      );
+      map.set(jobId, count + 1);
+    });
 
-      return map;
-    }, [allInterests]);
+    return map;
+  }, [allInterests]);
 
   /*
    * Sort jobs newest first.
    * Prefer createdAt when available,
    * otherwise fall back to job date.
    */
-  const sortedJobs =
-    useMemo(() => {
-      return [...jobs].sort(
-        (a, b) => {
-          const createdA =
-            a.createdAt
-              ? new Date(
-                  a.createdAt,
-                ).getTime()
-              : new Date(
-                  a.date,
-                ).getTime();
+  const sortedJobs = useMemo(() => {
+    return [...jobs].sort((a, b) => {
+      const createdA = a.createdAt
+        ? new Date(a.createdAt).getTime()
+        : new Date(a.date).getTime();
 
-          const createdB =
-            b.createdAt
-              ? new Date(
-                  b.createdAt,
-                ).getTime()
-              : new Date(
-                  b.date,
-                ).getTime();
+      const createdB = b.createdAt
+        ? new Date(b.createdAt).getTime()
+        : new Date(b.date).getTime();
 
-          return (
-            createdB -
-            createdA
-          );
-        },
-      );
-    }, [jobs]);
+      return createdB - createdA;
+    });
+  }, [jobs]);
 
   /*
    * Search jobs across multiple fields.
    */
-  const filteredJobs =
-    useMemo(() => {
-      const query =
-        searchQuery
-          .trim()
-          .toLowerCase();
+  const filteredJobs = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
 
-      if (!query) {
-        return sortedJobs;
-      }
+    if (!query) {
+      return sortedJobs;
+    }
 
-      return sortedJobs.filter(
-        (job) => {
-          const farmer =
-            job.farmer;
+    return sortedJobs.filter((job) => {
+      const farmer = job.farmer;
 
-          const searchableValues = [
-            // Job information
-            job.id,
-            job.serviceType,
-            job.service_type,
-            job.date,
-            job.time,
-            job.duration,
-            job.associatesNeeded,
-            job.associates_needed,
-            job.skillLevel,
-            job.skill_level,
-            job.budget,
-            job.location,
-            job.status,
-            job.paymentMethod,
-            job.payment_method,
-            job.jobComment,
-            job.job_comment,
-            job.createdAt,
-            job.created_at,
+      const searchableValues = [
+        // Job information
+        job.id,
+        job.serviceType,
+        job.service_type,
+        job.date,
+        job.time,
+        job.duration,
+        job.associatesNeeded,
+        job.associates_needed,
+        job.skillLevel,
+        job.skill_level,
+        job.budget,
+        job.location,
+        job.status,
+        job.paymentMethod,
+        job.payment_method,
+        job.jobComment,
+        job.job_comment,
+        job.createdAt,
+        job.created_at,
 
-            // Farmer information
-            farmer?.id,
-            farmer?.name,
-            farmer?.phoneNumber,
-            farmer?.phone_number,
-            farmer?.location,
-            farmer?.userType,
-            farmer?.user_type,
-          ];
+        // Farmer information
+        farmer?.id,
+        farmer?.name,
+        farmer?.phoneNumber,
+        farmer?.phone_number,
+        farmer?.location,
+        farmer?.userType,
+        farmer?.user_type,
+      ];
 
-          return searchableValues.some(
-            (value) =>
-              String(
-                value ?? "",
-              )
-                .toLowerCase()
-                .includes(query),
-          );
-        },
+      return searchableValues.some((value) =>
+        String(value ?? "")
+          .toLowerCase()
+          .includes(query),
       );
-    }, [
-      sortedJobs,
-      searchQuery,
-    ]);
+    });
+  }, [sortedJobs, searchQuery]);
 
   /*
-   * ==========================================================================
-   * Job Status Badge
-   * ==========================================================================
+   * Generate a short, readable Job ID for display.
    *
-   * IMPORTANT:
-   * "Open" is displayed as "Open" rather than "Active"
-   * to remain consistent with the actual FYNDO job status.
+   * The actual UUID remains unchanged and is still
+   * used for navigation and database operations.
+   *
+   * Example:
+   * 550e8400-e29b-41d4-a716-446655440000
+   * becomes:
+   * #550E8400
    */
-  const getStatusBadge =
-    (status: string) => {
-      const variants: Record<
-        string,
-        {
-          variant: any;
-          label: string;
-        }
-      > = {
-        Open: {
-          variant:
-            "default",
-          label: "Open",
-        },
+  const getShortJobId = (jobId: string | undefined) => {
+    if (!jobId) {
+      return "N/A";
+    }
 
-        Assigned: {
-          variant:
-            "default",
-          label: "Assigned",
-        },
+    return `#${jobId.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+  };
 
-        Completed: {
-          variant:
-            "secondary",
-          label: "Completed",
-        },
+  /*
+   * Job Status Badge
+   */
+  const getStatusBadge = (status: string) => {
+    const variants: Record<
+      string,
+      {
+        variant: any;
+        label: string;
+      }
+    > = {
+      Open: {
+        variant: "default",
+        label: "Open",
+      },
 
-        Cancelled: {
-          variant:
-            "outline",
-          label: "Cancelled",
-        },
-      };
+      Assigned: {
+        variant: "default",
+        label: "Assigned",
+      },
 
-      const config =
-        variants[status] || {
-          variant:
-            "default",
-          label: status,
-        };
+      Completed: {
+        variant: "secondary",
+        label: "Completed",
+      },
 
-      return (
-        <Badge
-          variant={
-            config.variant
-          }
-        >
-          {config.label}
-        </Badge>
-      );
+      Cancelled: {
+        variant: "outline",
+        label: "Cancelled",
+      },
     };
+
+    const config = variants[status] || {
+      variant: "default",
+      label: status,
+    };
+
+    return (
+      <Badge variant={config.variant}>
+        {config.label}
+      </Badge>
+    );
+  };
 
   /*
    * Loading
@@ -410,18 +315,15 @@ export default function AdminJobs() {
     return (
       <Card>
         <CardContent className="py-8 text-center">
-
           <p className="text-destructive font-medium">
             Unable to load jobs
           </p>
 
           <p className="text-sm text-muted-foreground mt-2">
-            {error instanceof
-            Error
+            {error instanceof Error
               ? error.message
               : "An unexpected error occurred."}
           </p>
-
         </CardContent>
       </Card>
     );
@@ -433,77 +335,54 @@ export default function AdminJobs() {
   if (showPostJob) {
     return (
       <AdminPostJob
-        onClose={() =>
-          setShowPostJob(
-            false,
-          )
-        }
+        onClose={() => setShowPostJob(false)}
       />
     );
   }
 
   return (
     <Card className="bg-card/80 backdrop-blur-xl border-card-border/60">
-
       <CardHeader className="space-y-4">
-
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-
           <CardTitle>
-            All Jobs (
-            {
-              filteredJobs.length
-            }
-            )
+            All Jobs ({filteredJobs.length})
           </CardTitle>
 
           <Button
-            onClick={() =>
-              setShowPostJob(
-                true,
-              )
-            }
+            onClick={() => setShowPostJob(true)}
             data-testid="button-post-job"
           >
             <Plus className="w-4 h-4 mr-2" />
             Post a Job
           </Button>
-
         </div>
 
         {/* Search */}
-
         <div className="relative">
-
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 
           <Input
-            value={
-              searchQuery
-            }
+            value={searchQuery}
             onChange={(e) =>
-              setSearchQuery(
-                e.target.value,
-              )
+              setSearchQuery(e.target.value)
             }
-            placeholder="Search jobs by farmer, mobile, service, location, status, budget..."
+            placeholder="Search jobs by ID, farmer, mobile, service, location, status, budget..."
             className="pl-9"
             data-testid="input-search-jobs"
           />
-
         </div>
-
       </CardHeader>
 
       <CardContent>
-
         <div className="overflow-x-auto">
-
           <Table>
-
             <TableHeader>
-
               <TableRow>
+
+                {/* Job ID */}
+                <TableHead>
+                  Job ID
+                </TableHead>
 
                 <TableHead>
                   Requested By
@@ -546,195 +425,146 @@ export default function AdminJobs() {
                 </TableHead>
 
               </TableRow>
-
             </TableHeader>
 
             <TableBody>
-
-              {filteredJobs.length ===
-              0 ? (
-
+              {filteredJobs.length === 0 ? (
                 <TableRow>
-
                   <TableCell
-                    colSpan={10}
+                    colSpan={11}
                     className="text-center text-muted-foreground py-8"
                   >
                     {searchQuery.trim()
                       ? "No jobs match your search."
                       : "No jobs found."}
                   </TableCell>
-
                 </TableRow>
-
               ) : (
+                filteredJobs.map((job) => (
+                  <TableRow
+                    key={job.id}
+                    data-testid={`row-job-${job.id}`}
+                  >
 
-                filteredJobs.map(
-                  (job) => (
-
-                    <TableRow
-                      key={
-                        job.id
-                      }
-                      data-testid={`row-job-${job.id}`}
-                    >
-
-                      {/* Farmer Name */}
-
-                      <TableCell>
-
-                        {job.farmer?.id ? (
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setLocation(
-                                `/admin/user/${job.farmer?.id}`,
-                              )
-                            }
-                            className="font-medium text-primary hover:underline hover:text-primary/80 transition-colors text-left"
-                            data-testid={`link-farmer-${job.farmer.id}`}
-                          >
-                            {
-                              job.farmer
-                                .name ||
-                              "Unknown"
-                            }
-                          </button>
-
-                        ) : (
-
-                          <span className="text-muted-foreground">
-                            Unknown
-                          </span>
-
-                        )}
-
-                      </TableCell>
-
-                      {/* Mobile */}
-
-                      <TableCell>
-                        {
-                          formatPhone(
-                            job.farmer
-                              ?.phoneNumber,
-                          ) ||
-                          "N/A"
-                        }
-                      </TableCell>
-
-                      {/* Service */}
-
-                      <TableCell>
-                        {
-                          job.serviceType ||
-                          "N/A"
-                        }
-                      </TableCell>
-
-                      {/* Workers */}
-
-                      <TableCell>
-                        {
-                          job.associatesNeeded ??
-                          0
-                        }
-                      </TableCell>
-
-                      {/* Days */}
-
-                      <TableCell>
-                        {
-                          job.duration ??
-                          0
-                        }
-                      </TableCell>
-
-                      {/* Budget */}
-
-                      <TableCell>
-                        ₹
-                        {
-                          job.budget ??
-                          0
-                        }
-                      </TableCell>
-
-                      {/* Interested */}
-
-                      <TableCell>
-
-                        <Badge
-                          variant="secondary"
-                          data-testid={`badge-interested-${job.id}`}
-                        >
-                          {
-                            interestCountMap.get(
-                              job.id,
-                            ) || 0
-                          }
-                        </Badge>
-
-                      </TableCell>
-
-                      {/* Created on */}
-
-                      <TableCell>
-
-                        {job.createdAt
-                          ? new Date(
-                              job.createdAt,
-                            ).toLocaleDateString()
-                          : job.date ||
-                            "N/A"}
-
-                      </TableCell>
-
-                      {/* Status */}
-
-                      <TableCell>
-                        {
-                          getStatusBadge(
-                            job.status,
-                          )
-                        }
-                      </TableCell>
-
-                      {/* Action */}
-
-                      <TableCell className="text-right">
-
-                        <Button
-                          variant="outline"
-                          size="icon"
+                    {/* Job ID */}
+                    <TableCell>
+                      {job.id ? (
+                        <button
+                          type="button"
                           onClick={() =>
                             setLocation(
                               `/admin/job/${job.id}`,
                             )
                           }
-                          data-testid={`button-view-job-${job.id}`}
+                          className="font-medium text-primary hover:underline hover:text-primary/80 transition-colors text-left whitespace-nowrap"
+                          title={`Open job ${job.id}`}
+                          data-testid={`link-job-id-${job.id}`}
                         >
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                          {getShortJobId(job.id)}
+                        </button>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          N/A
+                        </span>
+                      )}
+                    </TableCell>
 
-                      </TableCell>
+                    {/* Farmer Name */}
+                    <TableCell>
+                      {job.farmer?.id ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setLocation(
+                              `/admin/user/${job.farmer?.id}`,
+                            )
+                          }
+                          className="font-medium text-primary hover:underline hover:text-primary/80 transition-colors text-left"
+                          data-testid={`link-farmer-${job.farmer.id}`}
+                        >
+                          {job.farmer.name || "Unknown"}
+                        </button>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          Unknown
+                        </span>
+                      )}
+                    </TableCell>
 
-                    </TableRow>
+                    {/* Mobile */}
+                    <TableCell>
+                      {formatPhone(
+                        job.farmer?.phoneNumber,
+                      ) || "N/A"}
+                    </TableCell>
 
-                  ),
-                )
+                    {/* Service */}
+                    <TableCell>
+                      {job.serviceType || "N/A"}
+                    </TableCell>
 
+                    {/* Workers */}
+                    <TableCell>
+                      {job.associatesNeeded ?? 0}
+                    </TableCell>
+
+                    {/* Days */}
+                    <TableCell>
+                      {job.duration ?? 0}
+                    </TableCell>
+
+                    {/* Budget */}
+                    <TableCell>
+                      ₹{job.budget ?? 0}
+                    </TableCell>
+
+                    {/* Interested */}
+                    <TableCell>
+                      <Badge
+                        variant="secondary"
+                        data-testid={`badge-interested-${job.id}`}
+                      >
+                        {interestCountMap.get(job.id) || 0}
+                      </Badge>
+                    </TableCell>
+
+                    {/* Created on */}
+                    <TableCell>
+                      {job.createdAt
+                        ? new Date(
+                            job.createdAt,
+                          ).toLocaleDateString()
+                        : job.date || "N/A"}
+                    </TableCell>
+
+                    {/* Status */}
+                    <TableCell>
+                      {getStatusBadge(job.status)}
+                    </TableCell>
+
+                    {/* Action */}
+                    <TableCell className="text-right">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() =>
+                          setLocation(
+                            `/admin/job/${job.id}`,
+                          )
+                        }
+                        data-testid={`button-view-job-${job.id}`}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
+
+                  </TableRow>
+                ))
               )}
-
             </TableBody>
-
           </Table>
-
         </div>
-
       </CardContent>
-
     </Card>
   );
 }
