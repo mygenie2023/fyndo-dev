@@ -21,6 +21,7 @@ import {
   CheckCircle,
   Star,
   BriefcaseBusiness,
+  Phone,
 } from "lucide-react";
 import fyndoLogo from "@assets/FYNDO_v1.0_1770731684699.png";
 import BottomNav from "@/components/BottomNav";
@@ -1105,63 +1106,101 @@ export default function JobDetails() {
                                   </h3>
                                 </button>
 
-                                {/* Clickable Rating */}
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    openAssociateRatings(
-                                      associate.id
-                                    )
-                                  }
-                                  className="
-                                    mt-1.5
-                                    flex
-                                    items-center
-                                    gap-1.5
-                                    rounded-md
-                                    text-left
-                                    transition-opacity
-                                    hover:opacity-80
-                                    focus:outline-none
-                                    focus:ring-2
-                                    focus:ring-primary/30
-                                    focus:ring-offset-2
-                                  "
-                                  data-testid={`button-associate-rating-${associate.id}`}
-                                  aria-label={`View ratings for ${
-                                    associate.name ||
-                                    "Associate"
-                                  }`}
-                                >
-                                  <Star
-                                    className="
-                                      h-4
-                                      w-4
-                                      shrink-0
-                                      fill-primary
-                                      text-primary
-                                    "
-                                    strokeWidth={2}
-                                  />
+                               {/* Clickable Rating */}
+<button
+  type="button"
+  onClick={() =>
+    openAssociateRatings(
+      associate.id
+    )
+  }
+  className="
+    mt-1.5
+    flex
+    items-center
+    gap-1.5
+    rounded-md
+    text-left
+    transition-opacity
+    hover:opacity-80
+    focus:outline-none
+    focus:ring-2
+    focus:ring-primary/30
+    focus:ring-offset-2
+  "
+  data-testid={`button-associate-rating-${associate.id}`}
+  aria-label={`View ratings for ${
+    associate.name ||
+    "Associate"
+  }`}
+>
+  <Star
+    className="
+      h-4
+      w-4
+      shrink-0
+      fill-primary
+      text-primary
+    "
+    strokeWidth={2}
+  />
 
-                                  <span className="text-sm font-semibold text-[#1F372E]">
-                                    {rating.toFixed(
-                                      1
-                                    )}
-                                  </span>
+  <span className="text-sm font-semibold text-[#1F372E]">
+    {rating.toFixed(
+      1
+    )}
+  </span>
 
-                                  <span className="text-xs text-[#71827B]">
-                                    (
-                                    {
-                                      jobsCompleted
-                                    }{" "}
-                                    {jobsCompleted ===
-                                    1
-                                      ? "job"
-                                      : "jobs"}
-                                    )
-                                  </span>
-                                </button>
+  <span className="text-xs text-[#71827B]">
+    (
+    {
+      jobsCompleted
+    }{" "}
+    {jobsCompleted ===
+    1
+      ? "job"
+      : "jobs"}
+    )
+  </span>
+</button>
+
+{/* Associate Contact Number */}
+{associate.phoneNumber && (
+  <a
+    href={`tel:${associate.phoneNumber}`}
+    onClick={(e) =>
+      e.stopPropagation()
+    }
+    className="
+      mt-1.5
+      inline-flex
+      items-center
+      gap-1.5
+      rounded-md
+      text-xs
+      font-medium
+      text-primary
+      transition-opacity
+      hover:opacity-80
+      hover:underline
+      focus:outline-none
+      focus:ring-2
+      focus:ring-primary/30
+      focus:ring-offset-2
+    "
+    data-testid={`link-associate-phone-${associate.id}`}
+  >
+    <Phone
+      className="h-3.5 w-3.5 shrink-0"
+      strokeWidth={2.25}
+    />
+
+    <span>
+      {associate.phoneNumber}
+    </span>
+  </a>
+)}
+                                
 
                               </div>
 

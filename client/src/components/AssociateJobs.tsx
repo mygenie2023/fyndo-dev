@@ -13,6 +13,7 @@ import {
   TrendingUp,
   CheckCircle2,
   Navigation,
+  Phone,
   Wheat,
   Tractor,
   Zap,
@@ -66,6 +67,14 @@ const mapJobFromSupabase = (job: any): Job => {
     farmerId:
       job?.farmer_id ??
       job?.farmerId,
+
+    farmerName:
+      job?.farmer_name ??
+      job?.farmerName,
+
+    farmerPhoneNumber:
+      job?.farmer_phone_number ??
+      job?.farmerPhoneNumber,
 
     /*
      * IMPORTANT:
@@ -1163,6 +1172,31 @@ export default function AssociateJobs({
                 <Navigation className="h-3.5 w-3.5" />
               </button>
             </div>
+
+            {/* Farmer Information */}
+            {(job as any).farmerName && (
+              <div className="mt-2">
+                <p className="text-xs text-[#70867E]">
+                  Posted by:{" "}
+                  <span className="font-semibold text-[#1F372E]">
+                    {(job as any).farmerName}
+                  </span>
+                </p>
+
+                {(job as any).farmerPhoneNumber && (
+                  <a
+                    href={`tel:${(job as any).farmerPhoneNumber}`}
+                    className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Phone className="h-3.5 w-3.5" />
+                    <span>
+                      {(job as any).farmerPhoneNumber}
+                    </span>
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Status */}
