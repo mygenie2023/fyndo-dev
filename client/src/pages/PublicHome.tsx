@@ -1,6 +1,7 @@
 ﻿import { useI18n } from "@/i18n/website/provider";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { MarketplaceVisual } from "@/components/site/MarketplaceVisual";
+import { SEO } from "@/components/site/SEO";
 
 import { ButtonLink, OpenAppButton } from "@/components/ui/cta";
 import {
@@ -29,7 +30,7 @@ function Hero() {
           </span>
 
           <h1 className="mt-5 text-[2.4rem] leading-[1.03] font-extrabold sm:text-6xl lg:text-[4.1rem]">
-             {t("home.hero.title")}
+            {t("home.hero.title")}
           </h1>
 
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
@@ -91,15 +92,23 @@ function Hero() {
 
 export default function PublicHome() {
   return (
-    <SiteLayout>
-      <Hero />
-      <ProblemSection />
-      <TwoSidedSection />
-      <HowItWorksSection />
-      <CategoriesSection />
-      <NearbySection />
-      <TrustSection />
-      <AppCTA source="home_final_cta" />
-    </SiteLayout>
+    <>
+      <SEO
+        title="FYNDO - Local Jobs & Services Near You"
+        description="Find trusted local workers and service providers near you with FYNDO. Connect for agriculture, home, repair, rental, labour and other everyday services."
+        path="/"
+      />
+
+      <SiteLayout>
+        <Hero />
+        <ProblemSection />
+        <TwoSidedSection />
+        <HowItWorksSection />
+        <CategoriesSection />
+        <NearbySection />
+        <TrustSection />
+        <AppCTA source="home_final_cta" />
+      </SiteLayout>
+    </>
   );
 }

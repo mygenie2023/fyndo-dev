@@ -1,6 +1,7 @@
 ﻿import { SiteLayout } from "@/components/site/SiteLayout";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Section } from "@/components/site/Section";
+import { SEO } from "@/components/site/SEO";
 import { useI18n } from "@/i18n/website/provider";
 
 export default function PrivacyPage() {
@@ -8,6 +9,12 @@ export default function PrivacyPage() {
 
   return (
     <SiteLayout>
+      <SEO
+        title="FYNDO Privacy Policy | Local Jobs & Services"
+        description="Read the FYNDO privacy policy and learn how information is handled when using the FYNDO website and services."
+        path="/privacy"
+      />
+
       <Section>
         <Breadcrumbs
           items={[

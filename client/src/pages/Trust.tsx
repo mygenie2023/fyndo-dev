@@ -2,6 +2,7 @@
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Section } from "@/components/site/Section";
 import { AppCTA, TrustSection } from "@/components/site/Sections";
+import { SEO } from "@/components/site/SEO";
 import { useI18n } from "@/i18n/website/provider";
 
 export default function TrustPage() {
@@ -13,6 +14,12 @@ export default function TrustPage() {
 
   return (
     <SiteLayout>
+      <SEO
+        title="FYNDO Trust & Safety | Local Jobs & Services"
+        description="Learn how FYNDO approaches trust and safety when connecting people with local workers and service providers."
+        path="/trust"
+      />
+
       <Section className="hero-wash pt-10 pb-4">
         <Breadcrumbs
           items={[

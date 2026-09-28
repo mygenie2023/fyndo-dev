@@ -1,11 +1,16 @@
 ﻿import { SiteLayout } from "@/components/site/SiteLayout";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
-import { Reveal, Section, SectionHeading } from "@/components/site/Section";
+import {
+  Reveal,
+  Section,
+  SectionHeading,
+} from "@/components/site/Section";
 import {
   AppCTA,
   HowItWorksSection,
   TrustSection,
 } from "@/components/site/Sections";
+import { SEO } from "@/components/site/SEO";
 import { useI18n } from "@/i18n/website/provider";
 
 function Flow({
@@ -55,62 +60,74 @@ export default function HowItWorksPage() {
   );
 
   return (
-    <SiteLayout>
-      <Section className="hero-wash pt-10 pb-4">
-        <Breadcrumbs
-          items={[
-            {
-              label: t("pages.howItWorks.breadcrumb.home"),
-              to: "/",
-            },
-            {
-              label: t("pages.howItWorks.breadcrumb.current"),
-            },
-          ]}
-        />
+    <>
+      <SEO
+        title="How FYNDO Works | Find Local Jobs & Services"
+        description="Learn how FYNDO connects people who need work done with local workers and service providers. Explore the process for work providers and operators."
+        path="/how-it-works"
+      />
 
-        <div className="mt-6 max-w-3xl">
-          <h1 className="text-4xl leading-[1.05] font-extrabold sm:text-5xl">
-            {t("pages.howItWorks.hero.title")}
-          </h1>
+      <SiteLayout>
+        <Section className="hero-wash pt-10 pb-4">
+          <Breadcrumbs
+            items={[
+              {
+                label: t("pages.howItWorks.breadcrumb.home"),
+                to: "/",
+              },
+              {
+                label: t("pages.howItWorks.breadcrumb.current"),
+              },
+            ]}
+          />
 
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            {t("pages.howItWorks.hero.body")}
-          </p>
-        </div>
-      </Section>
+          <div className="mt-6 max-w-3xl">
+            <h1 className="text-4xl leading-[1.05] font-extrabold sm:text-5xl">
+              {t("pages.howItWorks.hero.title")}
+            </h1>
 
-      <HowItWorksSection />
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {t("pages.howItWorks.hero.body")}
+            </p>
+          </div>
+        </Section>
 
-      <Section>
-        <SectionHeading
-          eyebrow={t("pages.howItWorks.flow.eyebrow")}
-          title={t("pages.howItWorks.flow.title")}
-          description={t("pages.howItWorks.flow.description")}
-        />
+        <HowItWorksSection />
 
-        <div className="mt-12 grid gap-5 lg:grid-cols-2">
-          <Reveal>
-            <Flow
-              title={t("pages.howItWorks.flow.workProvider.title")}
-              steps={providerSteps}
-              tone="primary"
-            />
-          </Reveal>
+        <Section>
+          <SectionHeading
+            eyebrow={t("pages.howItWorks.flow.eyebrow")}
+            title={t("pages.howItWorks.flow.title")}
+            description={t("pages.howItWorks.flow.description")}
+          />
 
-          <Reveal delay={110}>
-            <Flow
-              title={t("pages.howItWorks.flow.operator.title")}
-              steps={operatorSteps}
-              tone="accent"
-            />
-          </Reveal>
-        </div>
-      </Section>
+          <div className="mt-12 grid gap-5 lg:grid-cols-2">
+            <Reveal>
+              <Flow
+                title={t(
+                  "pages.howItWorks.flow.workProvider.title",
+                )}
+                steps={providerSteps}
+                tone="primary"
+              />
+            </Reveal>
 
-      <TrustSection />
+            <Reveal delay={110}>
+              <Flow
+                title={t(
+                  "pages.howItWorks.flow.operator.title",
+                )}
+                steps={operatorSteps}
+                tone="accent"
+              />
+            </Reveal>
+          </div>
+        </Section>
 
-      <AppCTA source="how_it_works_cta" />
-    </SiteLayout>
+        <TrustSection />
+
+        <AppCTA source="how_it_works_cta" />
+      </SiteLayout>
+    </>
   );
 }

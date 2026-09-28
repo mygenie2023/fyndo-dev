@@ -1,4 +1,5 @@
-﻿import { Link, useRoute } from "wouter";
+﻿import { useEffect } from "react";
+import { Link, useRoute } from "wouter";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Reveal, Section, SectionHeading } from "@/components/site/Section";
@@ -14,8 +15,106 @@ function fill(template: string, name: string) {
   return template.replaceAll("{name}", name);
 }
 
+function updateMetaTag(
+  name: string,
+  content: string,
+  attribute: "name" | "property" = "name",
+) {
+  let element = document.head.querySelector(
+    `meta[${attribute}="${name}"]`,
+  ) as HTMLMetaElement | null;
+
+  if (!element) {
+    element = document.createElement("meta");
+    element.setAttribute(attribute, name);
+    document.head.appendChild(element);
+  }
+
+  element.setAttribute("content", content);
+}
+
+function updateCanonical(url: string) {
+  let element = document.head.querySelector(
+    'link[rel="canonical"]',
+  ) as HTMLLinkElement | null;
+
+  if (!element) {
+    element = document.createElement("link");
+    element.setAttribute("rel", "canonical");
+    document.head.appendChild(element);
+  }
+
+  element.setAttribute("href", url);
+}
+
+function removeServiceSchema() {
+  document
+    .getElementById("fyndo-service-schema")
+    ?.remove();
+}
+
 function ServiceNotFound() {
   const t = useI18n().t;
+
+  useEffect(() => {
+    document.title = "Service Not Found | FYNDO";
+
+    const description =
+      "The requested FYNDO service could not be found.";
+
+    updateMetaTag("description", description);
+
+    updateCanonical(
+      "https://fyndoin.com/services",
+    );
+
+    updateMetaTag(
+      "og:title",
+      "Service Not Found | FYNDO",
+      "property",
+    );
+
+    updateMetaTag(
+      "og:description",
+      description,
+      "property",
+    );
+
+    updateMetaTag(
+      "og:url",
+      "https://fyndoin.com/services",
+      "property",
+    );
+
+    updateMetaTag(
+      "og:type",
+      "website",
+      "property",
+    );
+
+    updateMetaTag(
+      "og:image",
+      "https://fyndoin.com/fyndo-logo.png",
+      "property",
+    );
+
+    updateMetaTag(
+      "twitter:title",
+      "Service Not Found | FYNDO",
+    );
+
+    updateMetaTag(
+      "twitter:description",
+      description,
+    );
+
+    updateMetaTag(
+      "twitter:image",
+      "https://fyndoin.com/fyndo-logo.png",
+    );
+
+    removeServiceSchema();
+  }, []);
 
   return (
     <SiteLayout>
@@ -41,7 +140,7 @@ function ServiceNotFound() {
 
 export default function ServiceDetailsPage() {
   const [, params] = useRoute("/services/:service");
-const slug = params?.service ?? "";
+  const slug = params?.service ?? "";
 
   const { t } = useI18n();
   const service = useService(slug);
@@ -50,9 +149,108 @@ const slug = params?.service ?? "";
     .filter((item) => item.slug !== slug)
     .slice(0, 3);
 
+  useEffect(() => {
+    if (!service) {
+      return;
+    }
+
+    const title = `FYNDO ${service.name} Services | Find ${service.name}s Near You`;
+
+    const description = service.summary;
+
+    const canonicalUrl =
+      `https://fyndoin.com/services/${service.slug}`;
+
+    document.title = title;
+
+    updateMetaTag(
+      "description",
+      description,
+    );
+
+    updateCanonical(canonicalUrl);
+
+    updateMetaTag(
+      "og:title",
+      title,
+      "property",
+    );
+
+    updateMetaTag(
+      "og:description",
+      description,
+      "property",
+    );
+
+    updateMetaTag(
+      "og:url",
+      canonicalUrl,
+      "property",
+    );
+
+    updateMetaTag(
+      "og:type",
+      "website",
+      "property",
+    );
+
+    updateMetaTag(
+      "og:image",
+      "https://fyndoin.com/fyndo-logo.png",
+      "property",
+    );
+
+    updateMetaTag(
+      "twitter:title",
+      title,
+    );
+
+    updateMetaTag(
+      "twitter:description",
+      description,
+    );
+
+    updateMetaTag(
+      "twitter:image",
+      "https://fyndoin.com/fyndo-logo.png",
+    );
+
+    removeServiceSchema();
+
+    const schema = document.createElement("script");
+
+    schema.id = "fyndo-service-schema";
+    schema.type = "application/ld+json";
+
+    schema.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: `FYNDO ${service.name}`,
+      description: service.summary,
+      url: canonicalUrl,
+      serviceType: service.name,
+      provider: {
+        "@type": "Organization",
+        name: "FYNDO",
+        url: "https://fyndoin.com/",
+        logo: "https://fyndoin.com/fyndo-logo.png",
+      },
+      areaServed: {
+        "@type": "Country",
+        name: "India",
+      },
+    });
+
+    document.head.appendChild(schema);
+
+    return () => {
+      removeServiceSchema();
+    };
+  }, [service]);
+
   if (!service) {
-  return <ServiceNotFound />;
-}
+    return <ServiceNotFound />;
+  }
 
   return (
     <SiteLayout>

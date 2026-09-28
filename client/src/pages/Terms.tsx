@@ -1,6 +1,7 @@
 ﻿import { SiteLayout } from "@/components/site/SiteLayout";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Section } from "@/components/site/Section";
+import { SEO } from "@/components/site/SEO";
 import { useI18n } from "@/i18n/website/provider";
 
 export default function TermsPage() {
@@ -8,6 +9,12 @@ export default function TermsPage() {
 
   return (
     <SiteLayout>
+      <SEO
+        title="FYNDO Terms of Use | Local Jobs & Services"
+        description="Read the FYNDO terms of use covering the website, local jobs marketplace, service providers and use of FYNDO services."
+        path="/terms"
+      />
+
       <Section>
         <Breadcrumbs
           items={[
